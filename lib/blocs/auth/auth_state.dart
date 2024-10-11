@@ -23,25 +23,14 @@ final class AuthErrorState extends AuthActionState {
 }
 
 
-//? OTP
-final class SentOtpSuccessState extends AuthActionState {}
-final class SentOtpFailedState extends AuthActionState {
-  final String errorMessage;
-  SentOtpFailedState({required this.errorMessage});
-}
+//? Password reset states
+class PasswordResetSuccessState extends AuthState {}
 
-final class VerifyOtpSuccessState extends AuthActionState {}
-final class VerifyOtpFailedState extends AuthActionState {
+class PasswordResetErrorState extends AuthState {
   final String errorMessage;
-  VerifyOtpFailedState({required this.errorMessage});
-}
 
-final class ResetPassSuccessState extends AuthActionState {}
-final class ResetPassFailedState extends AuthActionState {
-  final String errorMessage;
-  ResetPassFailedState({required this.errorMessage});
+  PasswordResetErrorState({required this.errorMessage});
 }
-
 
 //? Log Out
 final class LogoutSuccessState extends AuthActionState {}

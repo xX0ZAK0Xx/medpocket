@@ -21,20 +21,8 @@ class SignUpEvent extends AuthEvent{
 class LogoutEvent extends AuthEvent{}
 
 //!Forgot Password
-class SendOTPEvent extends AuthEvent{
+class PasswordResetEvent extends AuthEvent {
   final String email;
 
-  SendOTPEvent({required this.email});
-}
-
-class VerifyOTPEvent extends AuthEvent{
-  final String email, otp;
-
-  VerifyOTPEvent({required this.email, required this.otp});
-}
-
-class ResetPasswordEvent extends AuthEvent{
-  final String password;
-
-  ResetPasswordEvent({required this.password});
+  PasswordResetEvent({required this.email});
 }

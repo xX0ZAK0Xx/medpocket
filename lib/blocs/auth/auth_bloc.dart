@@ -19,6 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(loginEvent);
     on<SignUpEvent>(signUpEvent);
     on<LogoutEvent>(logoutEvent);
+    on<PasswordResetEvent>(passwordResetEvent);
   }
 
   FutureOr<void> initialFetchLoginDataEvent(
@@ -147,6 +148,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LogoutSuccessState());
     } catch (e) {
       emit(LogoutFailedState());
+    }
+  }
+  Future<void> passwordResetEvent(PasswordResetEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState()); // Optional: Emit loading state if needed
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: event.email);
+      logger.i("Password reset email sent successfully");
+      emit(PasswordResetSuccessState());
+    } on FirebaseAuthException catch (e) {
+      logger.e("Error sending password reset email: ${e.message}");
+      if (e.code == 'user-not-found') {
+        emit(PasswordResetErrorState(errorMessage: "No user found for that email."));
+      } else {
+        emit(PasswordResetErrorState(errorMessage: "Failed to send password reset email. Please try again."));
+      }
+    } catch (e) {
+      logger.e("Unknown error occurred: $e");
+      emit(PasswordResetErrorState(errorMessage: "An unknown error occurred. Please try again."));
     }
   }
 }

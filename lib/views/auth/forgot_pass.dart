@@ -33,16 +33,13 @@ class _ForgotPassState extends State<ForgotPass> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listenWhen: (previous, current) => current is SentOtpSuccessState || current is SentOtpFailedState || current is AuthLoadingState,
+        listenWhen: (previous, current) => current is PasswordResetSuccessState,
         listener: (context, state) {
           if (state is AuthLoadingState) {
             appLoadingDialog(context);
-          } else if (state is SentOtpFailedState){
+          } else if (state is PasswordResetSuccessState){
             AppRoutes.pop(context);
-            appErrorDialog(context, state.errorMessage);
-          } else if(state is SentOtpSuccessState){
-            AppRoutes.pop(context);
-            AppRoutes.push(context, VerifyOTP(email: emailController.text,));
+            AppRoutes.push(context, const EmailSent());
           }
         },
         child: Hero(
@@ -134,7 +131,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                     AppButton(text: "Send OTP", press: (){
                                       if(formKey.currentState!.validate()){
                                         // AppRoutes.push(context, const VerifyOTP());
-                                        context.read<AuthBloc>().add(SendOTPEvent(email: emailController.text.trim()));
+                                        context.read<AuthBloc>().add(PasswordResetEvent(email: emailController.text.trim()));
                                       }
                                     }, color: AppColors.bg, txtColor: AppColors.textColorb1,
                                     )

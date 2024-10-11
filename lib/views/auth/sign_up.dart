@@ -192,7 +192,7 @@ class _SignUpState extends State<SignUp> {
                               borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
                               splashColor: Colors.white.withOpacity(0.8), // Ripple color
                               onTap: () {
-                                AppRoutes.push(context, const SignInScreen());
+                                AppRoutes.pop(context);
                               },
                               child: Container(
                                 height: 80.h,
