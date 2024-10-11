@@ -1,4 +1,4 @@
-package com.medpocket.medpocket
+package com.med.pocket
 
 import io.flutter.embedding.android.FlutterActivity
 
