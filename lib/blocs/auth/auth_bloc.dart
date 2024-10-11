@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:medpocket/configs/app_urls.dart';
-import 'package:medpocket/repositories/post_response.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../configs/app_constants.dart';
 import '../../database/local_db.dart';
 import '../../models/model.dart';
@@ -15,42 +13,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   String? email, password, token, name, phone;
   LoginModel? loginModel;
   ResponseModel? responseModel;
+
   AuthBloc() : super(PreviousLoginInitial()) {
-    //?Login Logout
     on<InitialFetchLoginDataEvent>(initialFetchLoginDataEvent);
     on<LoginEvent>(loginEvent);
+    on<SignUpEvent>(signUpEvent);
     on<LogoutEvent>(logoutEvent);
-
-    //?Forgot Password
-    on<SendOTPEvent>(sendOTPEvent);
-    on<VerifyOTPEvent>(verifyOTPEvent);
-    on<ResetPasswordEvent>(resetPasswordEvent);
   }
 
-  FutureOr<void> initialFetchLoginDataEvent(InitialFetchLoginDataEvent event, Emitter<AuthState> emit) async {
+  FutureOr<void> initialFetchLoginDataEvent(
+      InitialFetchLoginDataEvent event, Emitter<AuthState> emit) async {
     try {
       final myData = await LocalDB.getLoginInfo();
-      if (myData == null || myData[0] == "" || myData[1] == "") {
+      if (myData == null || myData[0].isEmpty || myData[1].isEmpty) {
         emit(NoPreviousDataState());
       } else {
         logger.f("message myData: ${myData.length}");
         email = myData[0];
         password = myData[1];
-        token = myData[2];
-        Map<String, String> payload = {
-          "email": email??"",
-          "password": password??""
-        };
-        final loginResponse = await postResponse(url: AppUrls.login, payload: payload);
-        loginModel = loginModelFromJson(loginResponse);
 
-        await Future.delayed(const Duration(seconds: 1));
-
-        if(loginModel?.success == true) {
-          emit(LoginSuccessState());
-        }else{
-          emit(PreviousAuthErrorState(errorMessage: loginModel?.message??""));
-        }
+        await _handleSignIn(
+          email: email!,
+          password: password!,
+          onSuccess: () => emit(AuthSuccessState()),
+          onError: (message) => emit(AuthErrorState(errorMessage: message)),
+        );
       }
     } catch (e) {
       logger.e("Error during fetch login data: $e");
@@ -60,23 +47,97 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   FutureOr<void> loginEvent(LoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
-    Map<String, String> payload = {
-      "email": event.email,
-      "password": event.password
-    };
-    try {
-      final loginResponse = await postResponse(url: AppUrls.login, payload: payload);
-      loginModel = loginModelFromJson(loginResponse);
 
-      if(loginModel?.success == true) {
-        LocalDB.postLoginInfo(email: event.email, password: event.password, token: loginModel?.token??"");
-        emit(LoginSuccessState());
-      }else{
-        emit(AuthErrorState(errorMessage: loginModel?.message??""));
-      }
+    try {
+      await _handleSignIn(
+        email: event.email,
+        password: event.password,
+        onSuccess: () {
+          emit(AuthSuccessState());
+          LocalDB.postLoginInfo(email: event.email, password: event.password);
+        },
+        onError: (message) => emit(AuthErrorState(errorMessage: message)),
+      );
     } catch (e) {
-      emit(AuthErrorState(errorMessage: e.toString()));
+      logger.e("Login error: $e");
+      emit(AuthErrorState(errorMessage: "Login failed. Please try again."));
+    }
+  }
+
+  Future<void> _handleSignIn({
+    required String email,
+    required String password,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Connection timed out. Please try again.");
+      });
+
+      if (userCredential.user != null) {
+        logger.i("Logged in successfully");
+        onSuccess();
+      } else {
+        onError("Login failed. Please try again.");
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle Firebase-specific exceptions
+      if (e.code == 'user-not-found') {
+        logger.e('No user found for that email.');
+        onError("No user found for that email.");
+      } else if (e.code == 'wrong-password') {
+        logger.e('Wrong password provided for that user.');
+        onError("Wrong password provided for that user.");
+      } else {
+        // Log all other FirebaseAuthException cases
+        logger.e("FirebaseAuthException: ${e.message}");
+        onError("An error occurred: ${e.message}");
+      }
+    } on TimeoutException catch (_) {
+      logger.e("Login timeout.");
+      onError("Login timeout. Please check your internet connection.");
+    } catch (e) {
+      // Log and catch all other exceptions
+      logger.e("Unknown error occurred: $e");
+      onError("An unknown error occurred. Please try again.");
+    }
+  }
+
+
+  Future<void> signUpEvent(SignUpEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: event.email,
+            password: event.password,
+          )
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Connection timed out. Please try again.");
+      });
+
+      if (userCredential.user != null) {
+        emit(AuthSuccessState());
+        LocalDB.postLoginInfo(email: event.email, password: event.password);
+      } else {
+        emit(AuthErrorState(errorMessage: "Something went wrong"));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        logger.e('The password provided is too weak.');
+        emit(AuthErrorState(errorMessage: "The password provided is too weak."));
+      } else if (e.code == 'email-already-in-use') {
+        logger.e('The account already exists for that email.');
+        emit(AuthErrorState(errorMessage: "The account already exists for that email."));
+      }
+    } on TimeoutException catch (_) {
+      emit(AuthErrorState(errorMessage: "Sign-up timeout. Please try again."));
+    } catch (e) {
       logger.e(e);
+      emit(AuthErrorState(errorMessage: "An error occurred: $e"));
     }
   }
 
@@ -86,67 +147,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LogoutSuccessState());
     } catch (e) {
       emit(LogoutFailedState());
-    }
-  }
-
-  FutureOr<void> sendOTPEvent(SendOTPEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState());
-    Map<String, String> payload = {
-      "email": event.email,
-      "type":"reset_btob"
-    };
-    try {
-      final sendOtpResponse = await postResponse(url: AppUrls.sendOtp, payload: payload);
-      final ResponseModel responseModel = responseModelFromJson(sendOtpResponse);
-      if(responseModel.success == true) {
-        emit(SentOtpSuccessState());
-      }else{
-        emit(SentOtpFailedState(errorMessage: responseModel.message??"Something Went Wrong"));
-      }
-    } catch (e) {
-      emit(AuthErrorState(errorMessage: e.toString()));
-      logger.e(e);
-    }
-  }
-
-  FutureOr<void> verifyOTPEvent(VerifyOTPEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState());
-    Map<String, String> payload = {
-      "email": event.email,
-      "otp": event.otp,
-      "type":"reset_btob"
-    };
-    try {
-      final verifyOtpResponse = await postResponse(url: AppUrls.verifyOtp, payload: payload);
-      responseModel = responseModelFromJson(verifyOtpResponse);
-      if(responseModel?.success == true) {
-        emit(VerifyOtpSuccessState());
-      }else{
-        emit(VerifyOtpFailedState(errorMessage: responseModel?.message??"Something went wrong"));
-      }
-    } catch (e) {
-      emit(VerifyOtpFailedState(errorMessage: e.toString()));
-      logger.e(e);
-    }
-  }
-
-  FutureOr<void> resetPasswordEvent(ResetPasswordEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState());
-    Map<String, String> payload = {
-      "token": responseModel?.token??"",
-      "password": event.password,
-    };
-    try {
-      final resetPassResponse = await postResponse(url: AppUrls.resetPassword, payload: payload);
-      ResponseModel responseModel = responseModelFromJson(resetPassResponse);
-      if(responseModel.success == true) {
-        emit(ResetPassSuccessState());
-      }else{
-        emit(ResetPassFailedState(errorMessage: responseModel.message??"Something went wrong"));
-      }
-    } catch (e) {
-      emit(ResetPassFailedState(errorMessage: e.toString()));
-      logger.e(e);
     }
   }
 }

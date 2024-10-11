@@ -36,14 +36,14 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listenWhen: (previous, current) => current is LoginSuccessState || current is AuthErrorState || current is AuthLoadingState,
+      listenWhen: (previous, current) => current is AuthSuccessState || current is AuthErrorState || current is AuthLoadingState,
       listener: (context, state) {
        if(state is AuthLoadingState){
           appLoadingDialog(context);
         } else if(state is AuthErrorState){
           AppRoutes.pop(context);
           appErrorDialog(context, state.errorMessage);
-        } else if(state is LoginSuccessState){
+        } else if(state is AuthSuccessState){
           AppRoutes.pop(context);
           AppRoutes.pushAndRemoveUntil(context, const RootScreen());
         }

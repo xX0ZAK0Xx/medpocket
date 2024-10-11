@@ -76,14 +76,14 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: BlocListener<AuthBloc, AuthState>(
-        listenWhen: (previous, current) => current is LoginSuccessState || current is PreviousAuthErrorState,
+        listenWhen: (previous, current) => current is AuthSuccessState || current is PreviousAuthErrorState,
         listener: (context, state) {
           if(state is PreviousAuthErrorState){
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.errorMessage),
               duration: const Duration(seconds: 1),
             ));
-          } else if(state is LoginSuccessState){
+          } else if(state is AuthSuccessState){
             AppRoutes.pushAndRemoveUntil(context, const RootScreen());
           }
         },

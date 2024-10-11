@@ -15,7 +15,7 @@ final class PreviousAuthErrorState extends AuthActionState {
 
 //?Normal Login
 final class AuthLoadingState extends AuthActionState {}
-final class LoginSuccessState extends AuthActionState {}
+final class AuthSuccessState extends AuthActionState {}
 final class AuthErrorState extends AuthActionState {
   final String errorMessage;
 

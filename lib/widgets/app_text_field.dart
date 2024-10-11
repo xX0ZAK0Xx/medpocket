@@ -112,7 +112,7 @@ class AppTextField extends StatelessWidget {
                 borderSide: const BorderSide(color: AppColors.seed,width: 0.5)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSizes.bodyPadding - 5),
-                borderSide: const BorderSide(color: AppColors.primary,width: 0.5)),
+                borderSide: const BorderSide(color: AppColors.primary,width: 0.0)),
             focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSizes.bodyPadding - 5),
                 borderSide: BorderSide(color: AppColors.error(context),width: 0.5)),

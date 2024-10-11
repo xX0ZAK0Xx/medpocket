@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalDB {
 
   //!POST Login Information
-  static Future<void> postLoginInfo({required String email, required String password, required String token}) async {
+  static Future<void> postLoginInfo({required String email, required String password}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // final box = await Hive.openBox(loginBox);
     // box.put(loginBox, [
@@ -11,15 +11,14 @@ class LocalDB {
     //   password,
     //   token
     // ]);
-    await prefs.setString('email_musafir_agent', email);
-    await prefs.setString('password_musafir_agent', password);
-    await prefs.setString('token_musafir_agent', token);
+    await prefs.setString('email_med_pocket', email);
+    await prefs.setString('password_med_pocket', password);
   }
 
   //!Get Token 
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token_musafir_agent')?? "";
+    return prefs.getString('token_med_pocket')?? "";
   }
 
   //!Get Login Information
@@ -28,7 +27,7 @@ class LocalDB {
     // final info = box.get(loginBox);
     // return info;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return [prefs.getString('email_musafir_agent')??"", prefs.getString('password_musafir_agent')??"", prefs.getString('token_musafir_agent')??""];
+    return [prefs.getString('email_med_pocket')??"", prefs.getString('password_med_pocket')??""];
   }
 
   //!DEL Login Information
@@ -37,15 +36,5 @@ class LocalDB {
     // await box.clear();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-  }
-
-  static Future<void> setHajjUmrah({required bool isHajj})async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('isHajjUmrah_musafir_agent', '$isHajj');
-  }
-  
-  static Future<String?> getHajjUmrah() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('isHajjUmrah_musafir_agent')?? "";
   }
 }

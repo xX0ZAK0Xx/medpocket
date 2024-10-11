@@ -1,177 +1,233 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/app_sizes.dart';
+import 'package:medpocket/utils/app_validations.dart';
+import 'package:medpocket/views/views.dart';
 import 'package:medpocket/widgets/widgets.dart';
+
+import '../../blocs/bloc.dart';
 import '../../configs/colors.dart';
-import '../../utils/utils.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   const SignUp({super.key});
-  final String url = "sup.m360ict@gmail.com";
-  final String phone = "01958398339";
-  final String address = "Block#H, House#74, Banani, Dhaka";
-  final String addressLink = "https://maps.app.goo.gl/G8SUDZRS7hnLKFfa9";
 
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final passwordBloc = PasswordBloc();
+
+  @override
+  void dispose() {
+    super.dispose();
+    passwordController.dispose();
+    emailController.dispose();
+    formKey.currentState?.reset();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Hero(
-        tag: 'plane_image',
-        child: Stack(
-          children: [
-            // Background plane image with scale
-            Transform.scale(
-              scale: 1.5,
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/health_bg.png"),
-                    fit: BoxFit.cover,
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) => current is AuthSuccessState || current is AuthErrorState || current is AuthLoadingState,
+      listener: (context, state) {
+       if(state is AuthLoadingState){
+          appLoadingDialog(context);
+        } else if(state is AuthErrorState){
+          AppRoutes.pop(context);
+          appErrorDialog(context, state.errorMessage);
+        } else if(state is AuthSuccessState){
+          AppRoutes.pop(context);
+          AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+        }
+      },
+      child: Scaffold(
+        body: Hero(
+          tag: 'plane_image',
+          child: Stack(
+            children: [
+              // Background plane image with scale
+              Transform.scale(
+                scale: 1.5,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/health_bg.png"),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
-            // Frosted glass effect container
-            Container(
-              width: AppSizes.width(context),
-              padding: EdgeInsets.all(AppSizes.bodyPadding),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(113, 235, 239, 243),
-                    Color.fromARGB(197, 235, 239, 243),
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
+              // Frosted glass effect container
+              Container(
+                width: AppSizes.width(context),
+                padding: EdgeInsets.all(AppSizes.bodyPadding),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(113, 235, 239, 243),
+                      Color.fromARGB(197, 235, 239, 243),
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
-                        child: Container(
-                          height: 300.h,
-                          width: double.maxFinite,
-                          padding: EdgeInsets.all(AppSizes.bodyPadding),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.8), 
-                            borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.2), // Soft white border for effect
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
+                          child: Container(
+                            height: 300.h,
+                            padding: EdgeInsets.all(AppSizes.bodyPadding),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.8), 
+                              borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2), // Soft white border for effect
+                              ),
                             ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Get in Touch", style: myText(fontWeight: FontWeight.w700, color: AppColors.textColorw2, fontSize: 24.sp),),
-                                SizedBox(height: AppSizes.bodyPadding,),
-                                Text("For resister and other queries, please contact us through the following contact details.", style: myText(color: AppColors.textColorw1), textAlign: TextAlign.center,),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: ()=> launchEmail(email: url),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            HugeIcon(
-                                              icon: HugeIcons.strokeRoundedMail01,
-                                              color: AppColors.textColorw1,
-                                              size: 16.0.sp,
-                                            ),
-                                            SizedBox(width: AppSizes.bodyPadding,),
-                                            Text(url,style: myText(color: AppColors.textColorw1).copyWith(decoration: TextDecoration.underline, decorationColor: AppColors.textColorw2), textAlign: TextAlign.center,),
-                                          ],
+                                // Wrapping the form fields with Material to ensure proper rendering
+                                Material(
+                                  color: Colors.transparent,
+                                  child: Form(
+                                    key: formKey,
+                                    child: Column(
+                                      children: [
+                                        AppTextField(
+                                          textInputAction: TextInputAction.next,
+                                          labelText: "Email", 
+                                          hintText: "Enter your email", 
+                                          keyboardType: TextInputType.emailAddress, 
+                                          controller: emailController,
+                                          isRequired: true,
+                                          labelColor: AppColors.textColorw1,
+                                          hintColor: AppColors.textColorw3,
+                                          fillColor: AppColors.bg.withOpacity(0.1),
+                                          textColor: AppColors.textColorw1,
+                                          validator: (p0) => p0!.isEmpty ? "Please enter your email" : !emailValidate(p0) ? "Please enter a valid email" : null,
                                         ),
-                                      ),
-                                      SizedBox(height: AppSizes.bodyPadding / 2,),
-                                      GestureDetector(
-                                        onTap: ()=> launchCall(phoneNumber: phone),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            HugeIcon(
-                                              icon: HugeIcons.strokeRoundedCall02,
-                                              color: AppColors.textColorw1,
-                                              size: 16.0.sp,
-                                            ),
-                                            SizedBox(width: AppSizes.bodyPadding,),
-                                            Text(phone,style: myText(color: AppColors.textColorw1).copyWith(decoration: TextDecoration.underline, decorationColor: AppColors.textColorw2), textAlign: TextAlign.center,),
-                                          ],
+                                        SizedBox(height: AppSizes.bodyPadding,),
+                                        BlocBuilder<PasswordBloc, PasswordState>(
+                                          bloc: passwordBloc,
+                                          builder: (context, state) {
+                                            // final bloc = BlocProvider.of<PasswordBloc>(context);
+                                            return AppTextField(
+                                              obscureText: !passwordBloc.passwordVisible,
+                                              textInputAction: TextInputAction.done,
+                                              labelText: "Password",
+                                              hintText: "Enter your password",
+                                              keyboardType: TextInputType.emailAddress,
+                                              controller: passwordController,
+                                              labelColor: AppColors.textColorw1,
+                                              hintColor: AppColors.textColorw3,
+                                              fillColor: AppColors.bg.withOpacity(0.1),
+                                              textColor: AppColors.textColorw1,
+                                              isRequired: true,
+                                              suffixIcon: GestureDetector(
+                                                onTap: () {
+                                                  passwordBloc.add(TogglePasswordEvent());
+                                                },
+                                                child: HugeIcon(
+                                                  icon: passwordBloc.passwordVisible
+                                                      ? HugeIcons.strokeRoundedView
+                                                      : HugeIcons.strokeRoundedViewOff,
+                                                  color: AppColors.textColorw1,
+                                                  size: 24.0.r,
+                                                ),
+                                              ),
+                                              validator: (p0) => p0!.isEmpty ? "Please Enter Password" : null,
+                                            );
+                                          },
                                         ),
-                                      ),
-                                      SizedBox(height: AppSizes.bodyPadding / 2,),
-                                      GestureDetector(
-                                        onTap: ()=> launchUrlSite(url: addressLink),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            HugeIcon(
-                                              icon: HugeIcons.strokeRoundedMapsSquare01,
-                                              color: AppColors.textColorw1,
-                                              size: 16.0.sp,
-                                            ),
-                                            SizedBox(width: AppSizes.bodyPadding,),
-                                            Text(address,style: myText(color: AppColors.textColorw1).copyWith(decoration: TextDecoration.underline, decorationColor: AppColors.textColorw2), textAlign: TextAlign.center,),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                        SizedBox(height: AppSizes.bodyPadding,),
+                                        // Row(
+                                        //   mainAxisAlignment: MainAxisAlignment.end,
+                                        //   children: [
+                                        //     GestureDetector(
+                                        //       onTap: () => AppRoutes.push(context, const ForgotPass()),
+                                        //       child: Text("Forgot Password?", style: myText(fontWeight: FontWeight.w500, color: AppColors.textColorw2, fontSize: 12.sp),),
+                                        //     )
+                                        //   ],
+                                        // )
+                                      ],
+                                    ),
                                   ),
                                 ),
+                                AppButton(text: "Sign Up", press: (){
+                                  if(formKey.currentState!.validate()){
+                                    context.read<AuthBloc>().add(SignUpEvent(email: emailController.text, password:passwordController.text,));
+                                    // appLoadingDialog(context);
+                                    // appErrorDialog(context, "sefkglk");
+                                  }
+                                }, color: AppColors.bg, txtColor: AppColors.textColorb1,
+                                )
                               ],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // New Ripple Effect for 'Create New Account' Container
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
-                            splashColor: Colors.white.withOpacity(0.8), // Ripple color
-                            onTap: () {
-                            },
-                            child: Container(
-                              height: 80.h,
-                              padding: EdgeInsets.all(AppSizes.bodyPadding * 2),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2), // Soft white border for effect
+                      // New Ripple Effect for 'Create New Account' Container
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
+                              splashColor: Colors.white.withOpacity(0.8), // Ripple color
+                              onTap: () {
+                                AppRoutes.push(context, const SignInScreen());
+                              },
+                              child: Container(
+                                height: 80.h,
+                                padding: EdgeInsets.all(AppSizes.bodyPadding),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(AppSizes.borderRadius + AppSizes.bodyPadding),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2), // Soft white border for effect
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Or", style: myText(color: AppColors.textColorw1, fontSize: 12),),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(child: Text("Do you want to go back to Sign In?", textAlign: TextAlign.center, style: myText(color: AppColors.textColorw1),)),
+                                      ],
+                                    )  
+                                  ],
                                 ),
                               ),
-                              child: AppButton(text: "Back to Sign In", press: (){
-                                AppRoutes.pop(context);
-                              }, color: AppColors.bg, txtColor: AppColors.textColorb1,)
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
