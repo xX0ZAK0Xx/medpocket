@@ -7,7 +7,7 @@ void openFullScreen(BuildContext context, String imageUrl, String title, {bool o
     context: context,
     builder: (context) => Dialog(
       backgroundColor: Colors.transparent, // Make dialog background transparent
-      insetPadding: EdgeInsets.all(0),
+      insetPadding: const EdgeInsets.all(0),
       child: Stack(
         children: [
           // Blurred and darkened background

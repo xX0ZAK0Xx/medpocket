@@ -14,7 +14,7 @@ void showImageSourceSheet(BuildContext context, ImageBloc bloc, String usedFor) 
         child: Wrap(
           children: [
             ListTile(
-              leading: HugeIcon(
+              leading: const HugeIcon(
                 icon: HugeIcons.strokeRoundedImage02,
                 color: Colors.black,
                 size: 24.0,

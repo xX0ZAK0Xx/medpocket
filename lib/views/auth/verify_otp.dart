@@ -12,7 +12,7 @@ import '../../configs/colors.dart';
 import '../views.dart';
 
 class VerifyOTP extends StatelessWidget {
-  VerifyOTP({super.key, required this.email});
+  const VerifyOTP({super.key, required this.email});
   final String email;
 
   @override
@@ -37,16 +37,13 @@ class VerifyOTP extends StatelessWidget {
           child: Stack(
             children: [
               // Background plane image with scale
-              Transform.translate(
-                offset: Offset(60.w, 0),
-                child: Transform.scale(
-                  scale: 1.5,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/plane_bg.png"),
-                        fit: BoxFit.cover,
-                      ),
+              Transform.scale(
+                scale: 1.5,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/health_bg.png"),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

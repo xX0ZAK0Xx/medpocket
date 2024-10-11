@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
@@ -19,7 +20,6 @@ class SplashScreen extends StatefulWidget {
 class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _zoomAnimation;
-  late Animation<Offset> _slideAnimation;
   late Animation<Color?> _startGradientColorAnimation;
   late Animation<Color?> _endGradientColorAnimation;
 
@@ -39,13 +39,6 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-
-    // Slide animation
-    _slideAnimation = Tween<Offset>(begin: Offset.zero, end: Offset(40.w, 0)).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
-
 
     // Gradient color animation
     _startGradientColorAnimation = ColorTween(
@@ -104,14 +97,11 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
                 builder: (context, child) {
                   return Transform.scale(
                     scale: _zoomAnimation.value,
-                    child: Transform.translate(
-                      offset: _slideAnimation.value,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/plane_bg.png"),
-                            fit: BoxFit.cover,
-                          ),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/health_bg.png"),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -147,17 +137,17 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
                             style: myText(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w300,
-                                color: AppColors.bg),
+                                color: AppColors.primary),
                             children: <TextSpan>[
-                              const TextSpan(text: 'Manage all your\n'),
+                              const TextSpan(text: 'Track all your\n'),
                               TextSpan(
-                                text: 'Bookings\n',
+                                text: 'Health Reports\n',
                                 style: myText(
                                     fontSize: 35,
                                     fontWeight: FontWeight.w900,
-                                    color: AppColors.bg),
+                                    color: AppColors.primary),
                               ),
-                              const TextSpan(text: 'in one place'),
+                              const TextSpan(text: 'at one place'),
                             ],
                           ),
                         ),
@@ -178,12 +168,13 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
                                       height: 50.h,
                                       padding: EdgeInsets.all(AppSizes.bodyPadding),
                                       decoration: BoxDecoration(
-                                          color: AppColors.bg,
+                                          color: AppColors.primary,
                                           borderRadius: BorderRadius.horizontal(
                                               left: Radius.circular(AppSizes.borderRadius))),
                                       child: Center(
                                           child: Text("Get Started",
                                               style: myText(
+                                                color: AppColors.bg,
                                                   fontSize: 18.sp,
                                                   fontWeight: FontWeight.bold))),
                                     ),
@@ -192,17 +183,15 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
                                     height: 50.h,
                                     padding: EdgeInsets.all(AppSizes.bodyPadding),
                                     decoration: BoxDecoration(
-                                        color: AppColors.primary,
+                                        color: AppColors.bg,
                                         borderRadius: BorderRadius.horizontal(
                                             right: Radius.circular(AppSizes.borderRadius))),
                                     child: Center(
-                                      child: RotatedBox(
-                                          quarterTurns: 1,
-                                          child: Icon(
-                                            Icons.flight,
-                                            color: AppColors.bg,
-                                            size: 20.sp,
-                                          )),
+                                      child: HugeIcon(
+                                        icon: HugeIcons.strokeRoundedFavourite,
+                                        color: AppColors.primary,
+                                        size: 24.0.sp,
+                                      ),
                                     ),
                                   ),
                                 ],

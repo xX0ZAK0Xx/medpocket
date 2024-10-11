@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context)=>AuthBloc()),
       ],
       child: ScreenUtilInit(
-        designSize: const Size(411, 867),
+        designSize: const Size(392.72, 850.9),
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) => MaterialApp(

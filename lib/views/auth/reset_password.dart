@@ -54,16 +54,13 @@ class _ResetPassState extends State<ResetPass> {
           child: Stack(
             children: [
               // Background plane image with scale
-              Transform.translate(
-                offset: Offset(60.w, 0),
-                child: Transform.scale(
-                  scale: 1.5,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/plane_bg.png"),
-                        fit: BoxFit.cover,
-                      ),
+              Transform.scale(
+                scale: 1.5,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/health_bg.png"),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
