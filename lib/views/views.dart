@@ -1,0 +1,11 @@
+export 'booked_flight/booked_flight_screen.dart';
+export 'flight/flight_screen.dart';
+export 'splash/splash_screen.dart';
+export 'ticket/ticket_screen.dart';
+export 'visa/visa_screen.dart';
+export 'auth/sign_in_screen.dart';
+export 'auth/forgot_pass.dart';
+export 'auth/verify_otp.dart';
+export 'auth/reset_password.dart';
+export 'auth/sign_up.dart';
+export 'root.dart';
