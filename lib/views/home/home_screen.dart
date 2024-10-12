@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/views/home/segments/home_header.dart';
+import 'package:medpocket/views/home/segments/your_health.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,13 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: AppSizes.bodyPadding,),
-              const HomeHeader()
+              const HomeHeader(),
+              SizedBox(height: AppSizes.bodyPadding * 2),
+              Expanded(child: ListView(
+                children: const [
+                  YourHealth()
+                ],
+              ))
             ],
           ),
         ),
