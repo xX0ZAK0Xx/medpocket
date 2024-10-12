@@ -11,38 +11,17 @@ import '../../../configs/colors.dart';
 import '../../../widgets/widgets.dart';
 import 'dart:math';
 
-class BmiGraph extends StatelessWidget {
-  final List<double> heightsInInches = [68.9, 69.1, 69.1, 69.1, 69.3]; // Heights in inches
-  final List<double> weightsInKg = [65, 63, 66, 60, 68]; // Weights in kg
-  final List<DateTime> entryDates = [
-    DateTime(2023, 10, 1),
-    DateTime(2023, 10, 2),
-    DateTime(2023, 10, 3),
-    DateTime(2023, 10, 4),
-    DateTime(2023, 10, 5)
-  ];
+import 'bmi_class.dart';
 
-  BmiGraph({super.key});
+class BmiGraph extends StatelessWidget {
+
+  const BmiGraph({super.key});
 
   @override
   Widget build(BuildContext context) {
     context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 0));
-    // Calculate BMI values
-    List<double> bmiValues = List.generate(heightsInInches.length, (index) {
-      double heightInM = _convertInchesToMeters(heightsInInches[index]);
-      return weightsInKg[index] / pow(heightInM, 2);
-    });
-
-    // Calculate BMI statistics
-    double averageBmi = bmiValues.reduce((a, b) => a + b) / bmiValues.length;
-    double minBmi = bmiValues.reduce(min);
-    double maxBmi = bmiValues.reduce(max);
-
-    // Determine maxY based on the maximum height or weight value
-    double maxY = max(
-      heightsInInches.reduce(max),
-      weightsInKg.reduce(max),
-    );
+    // Calculate maxY based on the maximum height or weight value
+    double maxY = bmiEntries.map((entry) => max(entry.height, entry.weight)).reduce(max);
 
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
@@ -97,33 +76,32 @@ class BmiGraph extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppSizes.bodyPadding),
-          // Display BMI statistics
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BmiValues(averageBmi: averageBmi, title: 'Average', icon: HugeIcons.strokeRoundedChartAverage, color: AppColors.primary.withOpacity(0.1),),
-              BmiValues(averageBmi: minBmi, title: 'Minimum', icon: HugeIcons.strokeRoundedArrowDown05, color: AppColors.blue.withOpacity(0.1),),
-              BmiValues(averageBmi: maxBmi, title: 'Maximum', icon: HugeIcons.strokeRoundedArrowUp05, color: AppColors.secondary.withOpacity(0.1),),
-            ],
-          ),
+          // BMI Title and Date Range Selector (same as before)
+          _buildBmiStatistics(),
           SizedBox(height: AppSizes.bodyPadding * 2),
+          
+          // Make the graph scrollable horizontally
           SizedBox(
             height: 250.h,
-            child: _LineChart(
-              heightsInInches: heightsInInches,
-              weightsInKg: weightsInKg,
-              bmiValues: bmiValues,
-              entryDates: entryDates,
-              maxY: maxY,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: bmiEntries.length * 100.w, // Adjust width based on the data length
+                child: _LineChart(
+                  bmiEntries: bmiEntries,
+                  maxY: maxY,
+                ),
+              ),
             ),
           ),
+
           Row(
             children: [
-              const ColorMeaning(color: AppColors.secondary, value: 'Height',),
-              SizedBox(width: AppSizes.bodyPadding,),
-              const ColorMeaning(color: AppColors.blue, value: 'Weight',),
-              SizedBox(width: AppSizes.bodyPadding,),
-              const ColorMeaning(color: AppColors.primary, value: 'BMI',),
+              const ColorMeaning(color: AppColors.secondary, value: 'Height'),
+              SizedBox(width: AppSizes.bodyPadding),
+              const ColorMeaning(color: AppColors.blue, value: 'Weight'),
+              SizedBox(width: AppSizes.bodyPadding),
+              const ColorMeaning(color: AppColors.primary, value: 'BMI'),
             ],
           )
         ],
@@ -131,9 +109,20 @@ class BmiGraph extends StatelessWidget {
     );
   }
 
-  // Convert inches to meters for BMI calculation
-  double _convertInchesToMeters(double inches) {
-    return inches * 0.0254;
+  Widget _buildBmiStatistics() {
+    // Calculate BMI statistics (average, min, max)
+    double averageBmi = bmiEntries.map((entry) => entry.bmi).reduce((a, b) => a + b) / bmiEntries.length;
+    double minBmi = bmiEntries.map((entry) => entry.bmi).reduce(min);
+    double maxBmi = bmiEntries.map((entry) => entry.bmi).reduce(max);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        BmiValues(averageBmi: averageBmi, title: 'Average', icon: HugeIcons.strokeRoundedChartAverage, color: AppColors.primary.withOpacity(0.1)),
+        BmiValues(averageBmi: minBmi, title: 'Minimum', icon: HugeIcons.strokeRoundedArrowDown05, color: AppColors.blue.withOpacity(0.1)),
+        BmiValues(averageBmi: maxBmi, title: 'Maximum', icon: HugeIcons.strokeRoundedArrowUp05, color: AppColors.secondary.withOpacity(0.1)),
+      ],
+    );
   }
 }
 class ColorMeaning extends StatelessWidget {
@@ -203,17 +192,11 @@ class BmiValues extends StatelessWidget {
 }
 
 class _LineChart extends StatelessWidget {
-  final List<double> heightsInInches;
-  final List<double> weightsInKg;
-  final List<double> bmiValues;
-  final List<DateTime> entryDates;
+  final List<BmiEntry> bmiEntries;
   final double maxY;
 
   const _LineChart({
-    required this.heightsInInches,
-    required this.weightsInKg,
-    required this.bmiValues,
-    required this.entryDates,
+    required this.bmiEntries,
     required this.maxY,
   });
 
@@ -232,30 +215,48 @@ class _LineChart extends StatelessWidget {
         borderData: borderData,
         lineBarsData: lineBarsData1,
         minX: 0,
-        maxX: (entryDates.length - 1).toDouble(),
-        maxY: maxY + 10, // Add some padding to avoid touching the edges
+        maxX: (bmiEntries.length - 1).toDouble(),
+        maxY: maxY + 10, // Add some padding
         minY: 0,
+      );
+
+  FlGridData get gridData => const FlGridData(show: true);
+
+  FlBorderData get borderData => FlBorderData(
+        show: true,
+        border: Border.all(color: Colors.black.withOpacity(0.2), width: 2),
       );
 
   LineTouchData get lineTouchData1 => LineTouchData(
         touchTooltipData: LineTouchTooltipData(
+          fitInsideVertically: true, // Ensures tooltip fits inside the chart area
+          fitInsideHorizontally: true,
           getTooltipItems: (touchedSpots) {
+            return touchedSpots.map((touchedSpot) {
+              final index = touchedSpot.spotIndex;
+              final entry = bmiEntries[index];
+              String tooltipText;
 
-            final index = touchedSpots.first.spotIndex;
-            final heightInInches = heightsInInches[index];
-            final heightFtIn = _convertInchesToFeetInches(heightInInches);
-            final weightKg = weightsInKg[index];
-            final bmi = bmiValues[index].toStringAsFixed(2);
+              // Determine which line was touched by checking the barIndex
+              switch (touchedSpot.barIndex) {
+                case 0: // Height line
+                  tooltipText = 'Height: ${_convertInchesToFeetInches(entry.height)}';
+                  break;
+                case 1: // Weight line
+                  tooltipText = 'Weight: ${entry.weight.toStringAsFixed(1)} kg';
+                  break;
+                case 2: // BMI line
+                  tooltipText = 'BMI: ${entry.bmi.toStringAsFixed(2)}';
+                  break;
+                default:
+                  tooltipText = '';
+              }
 
-            return [
-              LineTooltipItem(
-                'Height: $heightFtIn\nWeight: ${weightKg.toStringAsFixed(1)} kg\nBMI: $bmi',
+              return LineTooltipItem(
+                tooltipText,
                 const TextStyle(color: AppColors.seed, fontWeight: FontWeight.bold),
-              ),
-              // Return null for the other spots to avoid duplication
-              if (touchedSpots.length > 1) null,
-              if (touchedSpots.length > 2) null,
-            ];
+              );
+            }).toList();
           },
         ),
       );
@@ -287,8 +288,8 @@ class _LineChart extends StatelessWidget {
         barWidth: 4,
         isStrokeCapRound: true,
         dotData: const FlDotData(show: false),
-        spots: List.generate(heightsInInches.length, (index) {
-          return FlSpot(index.toDouble(), heightsInInches[index]);
+        spots: List.generate(bmiEntries.length, (index) {
+          return FlSpot(index.toDouble(), bmiEntries[index].height);
         }),
       );
 
@@ -298,8 +299,8 @@ class _LineChart extends StatelessWidget {
         barWidth: 4,
         isStrokeCapRound: true,
         dotData: const FlDotData(show: false),
-        spots: List.generate(weightsInKg.length, (index) {
-          return FlSpot(index.toDouble(), weightsInKg[index]);
+        spots: List.generate(bmiEntries.length, (index) {
+          return FlSpot(index.toDouble(), bmiEntries[index].weight);
         }),
       );
 
@@ -309,45 +310,42 @@ class _LineChart extends StatelessWidget {
         barWidth: 4,
         isStrokeCapRound: true,
         dotData: const FlDotData(show: false),
-        spots: List.generate(bmiValues.length, (index) {
-          return FlSpot(index.toDouble(), bmiValues[index]);
+        spots: List.generate(bmiEntries.length, (index) {
+          return FlSpot(index.toDouble(), bmiEntries[index].bmi);
         }),
-      );
-
-  SideTitles leftTitles() => SideTitles(
-        showTitles: true,
-        reservedSize: 40,
-        getTitlesWidget: (value, meta) {
-          return Text(value.toStringAsFixed(0), style: const TextStyle(fontSize: 10));
-        },
-        interval: 10,
       );
 
   SideTitles get bottomTitles => SideTitles(
         showTitles: true,
         reservedSize: 40,
         getTitlesWidget: (value, meta) {
-          final date = entryDates[value.toInt()];
-          return Text(
-            convertDateTime(date, 'dd MMM\nyyyy'),
-            textAlign: TextAlign.center,
-            style: myText(fontSize: 10.sp),
-          );
+          // Ensure index is within bounds
+          if (value.toInt() >= 0 && value.toInt() < bmiEntries.length) {
+            final date = bmiEntries[value.toInt()].date;
+            return Text(
+              convertDateTime(date, 'dd MMM\nyyyy'),
+              textAlign: TextAlign.center,
+              style: myText(fontSize: 10.sp),
+            );
+          }
+          return const Text('');
         },
-        interval: 1,
+        interval: 1, 
       );
+}
 
-  FlGridData get gridData => const FlGridData(show: true);
+SideTitles leftTitles() => SideTitles(
+      showTitles: true,
+      reservedSize: 40,
+      getTitlesWidget: (value, meta) {
+        return Text(value.toStringAsFixed(0), style: const TextStyle(fontSize: 10));
+      },
+      interval: 10,
+    );
 
-  FlBorderData get borderData => FlBorderData(
-        show: true,
-        border: Border.all(color: Colors.black.withOpacity(0.2), width: 2),
-      );
-
-  String _convertInchesToFeetInches(double inches) {
-    int totalInches = inches.round();
-    int feet = totalInches ~/ 12;
-    int remainingInches = totalInches % 12;
-    return "${feet}ft ${remainingInches}in";
-  }
+String _convertInchesToFeetInches(double inches) {
+  int totalInches = inches.round();
+  int feet = totalInches ~/ 12;
+  int remainingInches = totalInches % 12;
+  return "${feet}ft ${remainingInches}in";
 }

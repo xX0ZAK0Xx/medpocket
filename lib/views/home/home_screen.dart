@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   const YourHealth(),
                   SizedBox(height: AppSizes.bodyPadding * 2),
-                  BmiGraph(),
+                  const BmiGraph(),
                 ],
               ))
             ],
