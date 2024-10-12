@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context)=>RootBloc()),
         BlocProvider(create: (context)=>AuthBloc()),
+        BlocProvider(create: (context)=>ShowBmiBloc()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(392.72, 850.9),

@@ -1,7 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:medpocket/blocs/show_bmi/show_bmi_bloc.dart';
 import 'package:medpocket/utils/app_convert_datetime.dart';
 
 import '../../../configs/app_sizes.dart';
@@ -24,6 +26,7 @@ class BmiGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 0));
     // Calculate BMI values
     List<double> bmiValues = List.generate(heightsInInches.length, (index) {
       double heightInM = _convertInchesToMeters(heightsInInches[index]);
@@ -58,30 +61,38 @@ class BmiGraph extends StatelessWidget {
                 "BMI",
                 style: myText(fontWeight: FontWeight.w500, color: AppColors.primary),
               ),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: (){
-
-                    },
-                    child: Text("7D", style: myText(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 14)),
-                  ),
-                  SizedBox(width: AppSizes.bodyPadding * 2,),
-                  GestureDetector(
-                    onTap: (){
-
-                    },
-                    child: Text("15D", style: myText(fontWeight: FontWeight.bold, color: AppColors.lightPink, fontSize: 14)),
-                  ),
-                  SizedBox(width: AppSizes.bodyPadding * 2,),
-                  GestureDetector(
-                    onTap: (){
-
-                    },
-                    child: Text("1M", style: myText(fontWeight: FontWeight.bold, color: AppColors.lightPink, fontSize: 14)),
-                  ),
-                  SizedBox(width: AppSizes.bodyPadding,)
-                ],
+              BlocBuilder<ShowBmiBloc, ShowBmiState>(
+                builder: (context, state) {
+                  if(state is ToggleDateRangeState){
+                    return Row(
+                      children: [
+                        GestureDetector(
+                          onTap: (){
+                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 0));
+                          },
+                          child: Text("7D", style: myText(fontWeight: FontWeight.bold, color: state.index == 0 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                        ),
+                        SizedBox(width: AppSizes.bodyPadding * 2,),
+                        GestureDetector(
+                          onTap: (){
+                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 1));
+                          },
+                          child: Text("15D", style: myText(fontWeight: FontWeight.bold, color: state.index == 1 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                        ),
+                        SizedBox(width: AppSizes.bodyPadding * 2,),
+                        GestureDetector(
+                          onTap: (){
+                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 2));
+                          },
+                          child: Text("1M", style: myText(fontWeight: FontWeight.bold, color: state.index == 2 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                        ),
+                        SizedBox(width: AppSizes.bodyPadding,)
+                      ],
+                    );
+                  }else{
+                    return const SizedBox.shrink();
+                  }
+                },
               ),
             ],
           ),
