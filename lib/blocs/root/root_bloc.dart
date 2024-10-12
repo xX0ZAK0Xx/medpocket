@@ -11,8 +11,8 @@ class RootBloc extends Bloc<RootEvent, RootState> {
   RootBloc() : super(RootInitial()) {
     on<RootInitialEvent>(rootInitialEvent);
     on<NavigateToHomeEvent>(navigateToHomeEvent);
-    on<NavigateToPreRegistrationEvent>(navigateToPreRegistrationEvent);
-    on<NavigateToPaymentEvent>(navigateToPaymentEvent);
+    on<NavigateToMedicineEvent>(navigateToMedicineEvent);
+    on<NavigateToReportsEvent>(navigateToReportsEvent);
     on<NavigateToProfileEvent>(navigateToProfileEvent);
     on<BackNavigationEvent>(backNavigationEvent); // Handle back button event
   }
@@ -28,14 +28,14 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     emit(NavigateToHomeState());
   }
 
-  FutureOr<void> navigateToPreRegistrationEvent(NavigateToPreRegistrationEvent event, Emitter<RootState> emit) {
+  FutureOr<void> navigateToMedicineEvent(NavigateToMedicineEvent event, Emitter<RootState> emit) {
     _updatePageHistory(1);
-    emit(NavigateToPreRegistrationState());
+    emit(NavigateToMedicineState());
   }
 
-  FutureOr<void> navigateToPaymentEvent(NavigateToPaymentEvent event, Emitter<RootState> emit) {
+  FutureOr<void> navigateToReportsEvent(NavigateToReportsEvent event, Emitter<RootState> emit) {
     _updatePageHistory(2);
-    emit(NavigateToPaymentState());
+    emit(NavigateToReportsState());
   }
 
   FutureOr<void> navigateToProfileEvent(NavigateToProfileEvent event, Emitter<RootState> emit) {
@@ -54,10 +54,10 @@ class RootBloc extends Bloc<RootEvent, RootState> {
           emit(NavigateToHomeState());
           break;
         case 1:
-          emit(NavigateToPreRegistrationState());
+          emit(NavigateToMedicineState());
           break;
         case 2:
-          emit(NavigateToPaymentState());
+          emit(NavigateToReportsState());
           break;
         case 3:
           emit(NavigateToProfileState());

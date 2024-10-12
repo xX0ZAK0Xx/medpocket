@@ -6,14 +6,14 @@ import 'package:medpocket/views/splash/splash_screen.dart';
 
 import '../../widgets/widgets.dart';
 
-class BookedFlightScreen extends StatelessWidget {
-  const BookedFlightScreen({super.key});
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Booked Flight Details'),
+        title: const Text('Profile Details'),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {

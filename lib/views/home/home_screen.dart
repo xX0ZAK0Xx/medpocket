@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class VisaScreen extends StatelessWidget {
-  const VisaScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Visa Details'),
+        title: const Text('Home Details'),
       ),
       body: const Center(
-        child: Text('Visa Screen'),
+        child: Text('Home Screen'),
       ),
     );
   }

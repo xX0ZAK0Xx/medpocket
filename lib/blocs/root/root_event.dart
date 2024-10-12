@@ -6,9 +6,9 @@ class RootInitialEvent extends RootEvent {}
 
 class NavigateToHomeEvent extends RootEvent {}
 
-class NavigateToPreRegistrationEvent extends RootEvent {}
+class NavigateToMedicineEvent extends RootEvent {}
 
-class NavigateToPaymentEvent extends RootEvent {}
+class NavigateToReportsEvent extends RootEvent {}
 
 class NavigateToProfileEvent extends RootEvent {}
 

@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,19 +9,19 @@ import 'package:medpocket/widgets/app_text_style.dart';
 import 'package:upgrader/upgrader.dart';
 
 import '../blocs/root/root_bloc.dart';
-import 'booked_flight/booked_flight_screen.dart';
-import 'flight/flight_screen.dart';
-import 'ticket/ticket_screen.dart';
-import 'visa/visa_screen.dart';
+import 'profile/profile_screen.dart';
+import 'reports/reports_screen.dart';
+import 'medicine/medicine_screen.dart';
+import 'home/home_screen.dart';
 
 class RootScreen extends StatelessWidget{
   const RootScreen({super.key});
 
   final List<Widget> screens = const [
-    VisaScreen(),
-    TicketScreen(),
-    FlightScreen(),
-    BookedFlightScreen(),
+    HomeScreen(),
+    MedicineScreen(),
+    ReportsScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -85,10 +86,10 @@ class RootScreen extends StatelessWidget{
                       child: buildNavItem(
                         context,
                         currentIndex == 1,
-                        icon: HugeIcons.strokeRoundedCreditCardValidation,
-                        label: "Pre-Registration",
+                        icon: HugeIcons.strokeRoundedMedicine02,
+                        label: "Medicine",
                         onTap: () {
-                          context.read<RootBloc>().add(NavigateToPreRegistrationEvent());
+                          context.read<RootBloc>().add(NavigateToMedicineEvent());
                         },
                       ),
                     ),
@@ -96,10 +97,10 @@ class RootScreen extends StatelessWidget{
                       child: buildNavItem(
                         context,
                         currentIndex == 2,
-                        icon: HugeIcons.strokeRoundedCreditCardPos,
-                        label: "Payment",
+                        icon: HugeIcons.strokeRoundedMedicalFile,
+                        label: "Reports",
                         onTap: () {
-                          context.read<RootBloc>().add(NavigateToPaymentEvent());
+                          context.read<RootBloc>().add(NavigateToReportsEvent());
                         },
                       ),
                     ),
@@ -127,7 +128,7 @@ class RootScreen extends StatelessWidget{
   Future<bool> _showExitConfirmationDialog(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => CupertinoAlertDialog(
         title: const Text("Exit App"),
         content: const Text("Do you really want to close the app?"),
         actions: [
@@ -156,7 +157,7 @@ class RootScreen extends StatelessWidget{
             width: isActive ? 30.w : 0.w,
             height: 1.h,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.secondary : Colors.transparent,
+              color: isActive ? AppColors.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(4.r),
             ),
           ),
@@ -169,14 +170,14 @@ class RootScreen extends StatelessWidget{
             child: HugeIcon(
               icon: icon,
               size: isActive ? 20.r : 16.r,
-              color: isActive ? AppColors.secondary : AppColors.textColorb3,
+              color: isActive ? AppColors.primary : AppColors.textColorb3,
             ),
           ),
           const SizedBox(height: 5),
           AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 300),
             style: myText(
-              color: isActive ? AppColors.secondary : AppColors.textColorb3,
+              color: isActive ? AppColors.primary : AppColors.textColorb3,
               fontSize: 12.sp,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),

@@ -8,10 +8,10 @@ final class RootInitial extends RootState {}
 
 class NavigateToHomeState extends RootState {}
 
-class NavigateToPreRegistrationState extends RootState {}
+class NavigateToMedicineState extends RootState {}
 
 class NavigateToProfileState extends RootState {}
 
-class NavigateToPaymentState extends RootState {}
+class NavigateToReportsState extends RootState {}
 
 class ShowExistAlertState extends RootState {}

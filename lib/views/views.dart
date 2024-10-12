@@ -1,8 +1,8 @@
-export 'booked_flight/booked_flight_screen.dart';
-export 'flight/flight_screen.dart';
+export 'profile/profile_screen.dart';
+export 'reports/reports_screen.dart';
 export 'splash/splash_screen.dart';
-export 'ticket/ticket_screen.dart';
-export 'visa/visa_screen.dart';
+export 'medicine/medicine_screen.dart';
+export 'home/home_screen.dart';
 export 'auth/sign_in_screen.dart';
 export 'auth/forgot_pass.dart';
 export 'auth/email_sent.dart';
