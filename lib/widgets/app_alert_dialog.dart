@@ -2,21 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:medpocket/widgets/app_text_style.dart';
 
 import '../configs/colors.dart';
+
 
 Future<void> appAlertDialog(
     BuildContext context,
     {
       List<Widget> actions = const <Widget>[],
-      bool barrierDismissible = false,
+      bool barrierDismissible = true,
       String? title,
       Color color = AppColors.bg,
       required Widget content
     }) async {
   final alert = CupertinoAlertDialog(
-    title: Text(title??"",style: myText(color: AppColors.textColorb1),),
     content: content,
     actions: actions,
   );
@@ -32,32 +33,36 @@ Future<void> appAlertDialog(
 
 Future<void> appLoadingDialog(BuildContext context) {
   return appAlertDialog(
+    barrierDismissible: false,
     context,
     content: SizedBox(
       height: 100.h,
       width: 100.w,
-      child: Stack( // Use Stack here
+      child: Stack(
         children: [
-          // Center the CircularProgressIndicator
+          // Center the Lottie animation within the Stack
           Positioned(
-            top: 0.h,
+            top: -10.h,
             left: 0,
             right: 0,
-            child: const Center(
-              child: CircularProgressIndicator.adaptive(),
+            child: Center(
+              child: SizedBox(
+                height: 80.h, // Adjust height as needed
+                child: Lottie.asset('assets/animations/loading.json'),
+              ),
             ),
           ),
-          // Position the text at the bottom
+          // Center the text at the bottom of the dialog
           Positioned(
-            bottom: 0.h,
+            bottom: 0.h, // Position it slightly above the bottom
             left: 0,
             right: 0,
             child: Center(
               child: Text(
                 "Loading.....",
                 style: myText(
-                  color: AppColors.textColorb1,
-                  fontSize: 16,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500
                 ),
               ),
             ),
@@ -67,7 +72,6 @@ Future<void> appLoadingDialog(BuildContext context) {
     ),
   );
 }
-
 
 Future<void> appErrorDialog(BuildContext context, String? message) {
   return appAlertDialog(

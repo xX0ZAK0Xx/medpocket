@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/blocs/auth/auth_bloc.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/views/splash/splash_screen.dart';
-import 'package:medpocket/widgets/app_button.dart';
+
+import '../../widgets/widgets.dart';
 
 class BookedFlightScreen extends StatelessWidget {
   const BookedFlightScreen({super.key});
