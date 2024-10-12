@@ -83,14 +83,11 @@ class BmiGraph extends StatelessWidget {
           // Make the graph scrollable horizontally
           SizedBox(
             height: 250.h,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: bmiEntries.length * 100.w, // Adjust width based on the data length
-                child: _LineChart(
-                  bmiEntries: bmiEntries,
-                  maxY: maxY,
-                ),
+            child: SizedBox(
+              // width: bmiEntries.length * 100.w, // Adjust width based on the data length
+              child: _LineChart(
+                bmiEntries: bmiEntries,
+                maxY: maxY,
               ),
             ),
           ),
@@ -240,7 +237,7 @@ class _LineChart extends StatelessWidget {
               // Determine which line was touched by checking the barIndex
               switch (touchedSpot.barIndex) {
                 case 0: // Height line
-                  tooltipText = 'Height: ${_convertInchesToFeetInches(entry.height)}';
+                  tooltipText = '${convertDateTime(entry.date, 'dd MMM, yyyy')}\n\nHeight: ${_convertInchesToFeetInches(entry.height)}';
                   break;
                 case 1: // Weight line
                   tooltipText = 'Weight: ${entry.weight.toStringAsFixed(1)} kg';
@@ -254,7 +251,7 @@ class _LineChart extends StatelessWidget {
 
               return LineTooltipItem(
                 tooltipText,
-                const TextStyle(color: AppColors.seed, fontWeight: FontWeight.bold),
+                const TextStyle(color: AppColors.seed, fontWeight: FontWeight.w400),
               );
             }).toList();
           },
@@ -287,7 +284,7 @@ class _LineChart extends StatelessWidget {
         color: AppColors.secondary,
         barWidth: 4,
         isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
+        dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
           return FlSpot(index.toDouble(), bmiEntries[index].height);
         }),
@@ -298,7 +295,7 @@ class _LineChart extends StatelessWidget {
         color: AppColors.blue,
         barWidth: 4,
         isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
+        dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
           return FlSpot(index.toDouble(), bmiEntries[index].weight);
         }),
@@ -309,7 +306,7 @@ class _LineChart extends StatelessWidget {
         color: AppColors.primary,
         barWidth: 4,
         isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
+        dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
           return FlSpot(index.toDouble(), bmiEntries[index].bmi);
         }),
@@ -322,23 +319,26 @@ class _LineChart extends StatelessWidget {
           // Ensure index is within bounds
           if (value.toInt() >= 0 && value.toInt() < bmiEntries.length) {
             final date = bmiEntries[value.toInt()].date;
-            return Text(
-              convertDateTime(date, 'dd MMM\nyyyy'),
-              textAlign: TextAlign.center,
-              style: myText(fontSize: 10.sp),
+            return RotatedBox(
+              quarterTurns: 3,
+              child: Text(
+                convertDateTime(date, 'dd MMM'),
+                textAlign: TextAlign.center,
+                style: myText(fontSize: 10.sp),
+              ),
             );
           }
           return const Text('');
         },
-        interval: 1, 
+        interval: 1, // Change this to 1 to take 1 unit of space
       );
 }
 
 SideTitles leftTitles() => SideTitles(
       showTitles: true,
-      reservedSize: 40,
+      reservedSize: 25.w,
       getTitlesWidget: (value, meta) {
-        return Text(value.toStringAsFixed(0), style: const TextStyle(fontSize: 10));
+        return Text(value.toStringAsFixed(0), style: myText(fontSize: 10));
       },
       interval: 10,
     );
