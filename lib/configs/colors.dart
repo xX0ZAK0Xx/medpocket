@@ -6,6 +6,7 @@ class AppColors{
   static const seed                   = Color(0xffAFFFDF);
   static const blue                   = Color(0xff0054b3);
   static const bg                     = Color.fromARGB(255, 248, 241, 243);
+  static const lightPink              = Color.fromARGB(255, 234, 192, 204);
   static const white                  = Color(0xffffffff);
   static const black                  = Color.fromARGB(255, 29, 29, 29);
   static const red                    = Colors.redAccent;

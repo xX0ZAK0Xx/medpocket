@@ -57,18 +57,19 @@ class BloodLevels extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(AppSizes.bodyPadding),
+            padding: EdgeInsets.all(AppSizes.bodyPadding / 2),
             decoration: BoxDecoration(
               color: color,
-              shape: BoxShape.circle
+              borderRadius: BorderRadius.circular(AppSizes.borderRadius)
+              // shape: BoxShape.circle
             ),
-            child: HugeIcon(icon: icon, color: AppColors.primary, size: 20.sp,),
+            child: HugeIcon(icon: icon, color: AppColors.primary, size: 24.sp,),
           ),
           SizedBox(width: AppSizes.bodyPadding / 2,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: myText(color: AppColors.primary, fontSize: 20.sp, fontWeight: FontWeight.w500),),
+              Text(value, style: myText(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 18.sp),),
               Text(title, style: myText(),),
           ],)
         ],
