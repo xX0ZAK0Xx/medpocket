@@ -146,7 +146,7 @@ class _SetupProfileState extends State<SetupProfile> {
                             maxValue: 220,
                             onChanged: (value) => setupProfileBloc.add(ChangeHeightEvent(height: value)),
                           ),
-                          Text(cmToFeetInch(setupProfileBloc.height.toDouble()))
+                          Text(cmToFeetInch(setupProfileBloc.height.toDouble()), style: myText(),)
                         ],
                       );
                     },
@@ -164,14 +164,16 @@ class _SetupProfileState extends State<SetupProfile> {
                 BlocBuilder<SetupProfileBloc, SetupProfileState>(
                   buildWhen: (previous, current) => current is ChangeWeightState,
                   builder: (context, state) {
-                    return NumberPicker(
-                      value: setupProfileBloc.weight,
-                      axis: Axis.horizontal,
-                      itemCount: 4,
-                      minValue: 30,
-                      selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
-                      maxValue: 150,
-                      onChanged: (value) => setupProfileBloc.add(ChangeWeightEvent(weight: value)),
+                    return FittedBox(
+                      child: NumberPicker(
+                        value: setupProfileBloc.weight,
+                        axis: Axis.horizontal,
+                        itemCount: 5,
+                        minValue: 30,
+                        selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
+                        maxValue: 150,
+                        onChanged: (value) => setupProfileBloc.add(ChangeWeightEvent(weight: value)),
+                      ),
                     );
                   },
                 ),
