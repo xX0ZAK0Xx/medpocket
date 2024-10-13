@@ -22,6 +22,9 @@ final class AuthErrorState extends AuthActionState {
   AuthErrorState({required this.errorMessage });
 }
 
+//?Verfication and user information
+// final class NeedToVerifyState extends AuthActionState{}
+// final class NeedToFillupInfoState extends AuthActionState{}
 
 //? Password reset states
 class PasswordResetSuccessState extends AuthState {}

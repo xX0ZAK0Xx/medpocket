@@ -79,7 +79,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       });
 
       if (userCredential.user != null) {
-        logger.i("Logged in successfully");
+        logger.i("Logged in: ${userCredential.user?.email} ${userCredential.user?.displayName}");
         onSuccess();
       } else {
         onError("Login failed. Please try again.");
