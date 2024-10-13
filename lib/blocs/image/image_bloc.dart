@@ -17,6 +17,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
   String originalImagePath = '';
   String resizedImagePath = '';
   bool onlineImage = false;
+  int index = 0;
 
   final ImagePicker imagePicker = ImagePicker();
 
@@ -30,6 +31,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
       final XFile? image = await imagePicker.pickImage(
         source: event.fromCamera ? ImageSource.camera : ImageSource.gallery,
       );
+
       if (image != null) {
         // Load and resize the image
         Uint8List imageBytes = await image.readAsBytes();
@@ -44,6 +46,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
         double aspectRatio = originalWidth / originalHeight;
         int targetHeight = (targetWidth / aspectRatio).round();
 
+        // Resize the image
         ui.Codec resizedCodec = await ui.instantiateImageCodec(
           imageBytes,
           targetWidth: targetWidth,
@@ -56,19 +59,24 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
         if (byteData != null) {
           Uint8List resizedImageBytes = byteData.buffer.asUint8List();
           Directory documentsDirectory = await getApplicationDocumentsDirectory();
-          String targetPath = '${documentsDirectory.path}/${event.usedFor}_resized_image.png';
+          String targetPath = '${documentsDirectory.path}/${event.usedFor}_resized_image${index++}.png';
           File resizedImageFile = File(targetPath);
           await resizedImageFile.writeAsBytes(resizedImageBytes);
 
+          // Update the paths
           originalImagePath = image.path;
           resizedImagePath = targetPath;
           onlineImage = false;
+
+          // Emit success state
+          logger.d(resizedImagePath);
           emit(ImageSelectSuccessState());
         } else {
           emit(ImageSelectFailedState());
         }
       } else {
-        if(resizedImagePath.isEmpty){
+        // Emit not selected state
+        if (resizedImagePath.isEmpty) {
           emit(ImageNotSelectState());
         }
       }
@@ -77,6 +85,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
       emit(ImageSelectFailedState());
     }
   }
+
 
   FutureOr<void> validateImageEvent(ValidateImageEvent event, Emitter<ImageState> emit) {
     if(resizedImagePath.isEmpty){

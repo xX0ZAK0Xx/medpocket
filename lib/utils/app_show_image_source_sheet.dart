@@ -13,6 +13,7 @@ void showImageSourceSheet(BuildContext context, ImageBloc bloc, String usedFor) 
       return SafeArea(
         child: Wrap(
           children: [
+            if(bloc.resizedImagePath.isNotEmpty)
             ListTile(
               leading: const HugeIcon(
                 icon: HugeIcons.strokeRoundedImage02,

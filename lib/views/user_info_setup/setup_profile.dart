@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medpocket/utils/utils.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import '../../blocs/bloc.dart';
 import '../../configs/app_sizes.dart';
+import '../../configs/colors.dart';
 import '../../widgets/widgets.dart';
 
 class SetupProfile extends StatefulWidget {
@@ -55,30 +58,36 @@ class _SetupProfileState extends State<SetupProfile> {
             BlocBuilder<ImageBloc, ImageState>(
               bloc: imageBloc,
               builder: (context, state) {
-                return Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Select image from gallery
-                        imageBloc.add(SelectImageEvent(
-                            fromCamera: false, usedFor: 'profile'));
-                      },
-                      child: const Text("Select Profile Image"),
-                    ),
-                    if (state is ImageSelectSuccessState) ...[
-                      Image.file(
-                        File(imageBloc.resizedImagePath),
-                        width: 100,
-                        height: 100,
+                return GestureDetector(
+                  onTap: () => showImageSourceSheet(context, imageBloc, "profile"),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
+                    child: Container(
+                      height: 250.h,
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: state is ImageNotSelectState ? AppColors.red : Colors.grey),
+                        borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
                       ),
-                    ],
-                    if (state is ImageNotSelectState)
-                      const Text("No image selected",
-                          style: TextStyle(color: Colors.red)),
-                  ],
+                      child: imageBloc.resizedImagePath.isNotEmpty
+                        ? Image.file(
+                            File(imageBloc.resizedImagePath), 
+                            fit: BoxFit.cover,
+                          )
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.camera_alt, size: 50.sp, color: Colors.grey),
+                            SizedBox(height: AppSizes.bodyPadding),
+                            Text("Profile Photo", style: myText()),
+                          ],
+                        ),
+                    ),
+                  ),
                 );
               },
             ),
+
             SizedBox(
               height: AppSizes.bodyPadding * 2,
             ),
@@ -132,6 +141,7 @@ class _SetupProfileState extends State<SetupProfile> {
                             haptics: true,
                             itemCount: 4,
                             value: setupProfileBloc.height,
+                            selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
                             minValue: 100,
                             maxValue: 220,
                             onChanged: (value) => setupProfileBloc.add(ChangeHeightEvent(height: value)),
@@ -159,6 +169,7 @@ class _SetupProfileState extends State<SetupProfile> {
                       axis: Axis.horizontal,
                       itemCount: 4,
                       minValue: 30,
+                      selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
                       maxValue: 150,
                       onChanged: (value) => setupProfileBloc.add(ChangeWeightEvent(weight: value)),
                     );
@@ -215,23 +226,13 @@ class _SetupProfileState extends State<SetupProfile> {
             ),
             SizedBox(height: AppSizes.bodyPadding * 2),
             // Save Button
-            ElevatedButton(
-              onPressed: () {
+            AppButton(
+              press: () {
                 // Handle form submission
               },
-              child: const Text("Save Profile"),
+              text: "Save Profile",
             ),
           ],
         ));
   }
-}
-
-String cmToFeetInch(double cm) {
-  double totalInches = cm / 2.54;
-
-  int feet = (totalInches / 12).floor();
-
-  double inches = totalInches % 12;
-
-  return "$feet ft ${(inches).toStringAsFixed(2)} in";
 }
