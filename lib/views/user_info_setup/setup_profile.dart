@@ -19,18 +19,20 @@ class _SetupProfileState extends State<SetupProfile> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  
-  String selectedBloodGroup = 'A+';
-  String selectedGender = 'Male';
-  int height = 160;
-  int weight = 60;
+
+  // String selectedBloodGroup = 'A+';
+  // String selectedGender = 'Male';
+  // int height = 160;
+  // int weight = 60;
 
   late ImageBloc imageBloc;
+  late SetupProfileBloc setupProfileBloc;
 
   @override
   void initState() {
     super.initState();
     imageBloc = ImageBloc();
+    setupProfileBloc = context.read<SetupProfileBloc>();
   }
 
   @override
@@ -45,9 +47,9 @@ class _SetupProfileState extends State<SetupProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Setup Profile")),
-      body: ListView(
-        padding: EdgeInsets.all(AppSizes.bodyPadding),
+        appBar: AppBar(title: const Text("Setup Profile")),
+        body: ListView(
+          padding: EdgeInsets.all(AppSizes.bodyPadding),
           children: [
             // Image Picker
             BlocBuilder<ImageBloc, ImageState>(
@@ -58,7 +60,8 @@ class _SetupProfileState extends State<SetupProfile> {
                     ElevatedButton(
                       onPressed: () {
                         // Select image from gallery
-                        imageBloc.add(SelectImageEvent(fromCamera: false, usedFor: 'profile'));
+                        imageBloc.add(SelectImageEvent(
+                            fromCamera: false, usedFor: 'profile'));
                       },
                       child: const Text("Select Profile Image"),
                     ),
@@ -70,12 +73,15 @@ class _SetupProfileState extends State<SetupProfile> {
                       ),
                     ],
                     if (state is ImageNotSelectState)
-                      const Text("No image selected", style: TextStyle(color: Colors.red)),
+                      const Text("No image selected",
+                          style: TextStyle(color: Colors.red)),
                   ],
                 );
               },
             ),
-            SizedBox(height: AppSizes.bodyPadding * 2,),
+            SizedBox(
+              height: AppSizes.bodyPadding * 2,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -109,41 +115,54 @@ class _SetupProfileState extends State<SetupProfile> {
                     ],
                   ),
                 ),
-                SizedBox(width: AppSizes.bodyPadding,),
+                SizedBox(
+                  width: AppSizes.bodyPadding,
+                ),
                 Expanded(
                   flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text("Height (cm)", style: myText(fontWeight: FontWeight.w500)),
-                      NumberPicker(
-                        haptics: true,
-                        itemCount: 4,
-                        value: height,
-                        minValue: 100,
-                        maxValue: 220,
-                        onChanged: (value) => setState(() => height = value),
-                      ),
-                      Text(cmToFeetInch(height.toDouble()))
-                    ],
+                  child: BlocBuilder<SetupProfileBloc, SetupProfileState>(
+                    buildWhen: (previous, current) => current is ChangeHeightState,
+                    builder: (context, state) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Height (cm)",
+                              style: myText(fontWeight: FontWeight.w500)),
+                          NumberPicker(
+                            haptics: true,
+                            itemCount: 4,
+                            value: setupProfileBloc.height,
+                            minValue: 100,
+                            maxValue: 220,
+                            onChanged: (value) => setupProfileBloc.add(ChangeHeightEvent(height: value)),
+                          ),
+                          Text(cmToFeetInch(setupProfileBloc.height.toDouble()))
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
             ),
             SizedBox(height: AppSizes.bodyPadding * 2),
-            
+
             // Number Picker for Weight
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Weight (kg)", style: myText(fontWeight: FontWeight.w500)),
-                NumberPicker(
-                  value: weight,
-                  axis: Axis.horizontal,
-                  itemCount: 4,
-                  minValue: 30,
-                  maxValue: 150,
-                  onChanged: (value) => setState(() => weight = value),
+                BlocBuilder<SetupProfileBloc, SetupProfileState>(
+                  buildWhen: (previous, current) => current is ChangeWeightState,
+                  builder: (context, state) {
+                    return NumberPicker(
+                      value: setupProfileBloc.weight,
+                      axis: Axis.horizontal,
+                      itemCount: 4,
+                      minValue: 30,
+                      maxValue: 150,
+                      onChanged: (value) => setupProfileBloc.add(ChangeWeightEvent(weight: value)),
+                    );
+                  },
                 ),
               ],
             ),
@@ -151,29 +170,44 @@ class _SetupProfileState extends State<SetupProfile> {
             Row(
               children: [
                 Expanded(
-                  child: AppDecoratedDropdown(
-                    label: "Blood Group",
-                    isRequired: true,
-                    selectedValue: selectedBloodGroup,
-                    items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedBloodGroup = value!;
-                      });
+                  child: BlocBuilder<SetupProfileBloc, SetupProfileState>(
+                    buildWhen: (previous, current) => current is SelectBloodGroupState,
+                    builder: (context, state) {
+                      return AppDecoratedDropdown(
+                        label: "Blood Group",
+                        isRequired: true,
+                        selectedValue: setupProfileBloc.bloodGroup,
+                        items: const [
+                          'A+',
+                          'A-',
+                          'B+',
+                          'B-',
+                          'AB+',
+                          'AB-',
+                          'O+',
+                          'O-'
+                        ],
+                        onChanged: (value) {
+                          setupProfileBloc.add(SelecteBloodGroupEvent(bloodGroup: value!));
+                        },
+                      );
                     },
                   ),
                 ),
                 SizedBox(width: AppSizes.bodyPadding),
                 Expanded(
-                  child: AppDecoratedDropdown(
-                    label: "Gender",
-                    isRequired: true,
-                    selectedValue: selectedGender,
-                    items: const ['Male', 'Female', 'Other'],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedGender = value!;
-                      });
+                  child: BlocBuilder<SetupProfileBloc, SetupProfileState>(
+                    buildWhen: (previous, current) => current is SelectGenderState,
+                    builder: (context, state) {
+                      return AppDecoratedDropdown(
+                        label: "Gender",
+                        isRequired: true,
+                        selectedValue: setupProfileBloc.gender,
+                        items: const ['Male', 'Female', 'Other'],
+                        onChanged: (value) {
+                          setupProfileBloc.add(SelecteGenderEvent(gender: value!));
+                        },
+                      );
                     },
                   ),
                 ),
@@ -188,16 +222,15 @@ class _SetupProfileState extends State<SetupProfile> {
               child: const Text("Save Profile"),
             ),
           ],
-      )
-    );
+        ));
   }
 }
 
 String cmToFeetInch(double cm) {
   double totalInches = cm / 2.54;
-  
+
   int feet = (totalInches / 12).floor();
-  
+
   double inches = totalInches % 12;
 
   return "$feet ft ${(inches).toStringAsFixed(2)} in";
