@@ -5,3 +5,4 @@ export 'app_dropdown.dart';
 export 'app_text_field.dart';
 export 'app_text_style.dart';
 export 'app_decorated_text_field.dart';
+export './app_decorated_dropdown.dart';
