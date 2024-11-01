@@ -1,4 +1,6 @@
 
+import '../models/model.dart';
+
 String cmToFeetInch(double cm) {
   double totalInches = cm / 2.54;
 
@@ -7,4 +9,16 @@ String cmToFeetInch(double cm) {
   double inches = totalInches % 12;
 
   return "$feet ft ${(inches).toStringAsFixed(2)} in";
+}
+
+Height cmToFeetInches(double cm) {
+  double totalInches = cm / 2.54; // Convert cm to inches
+  int feet = (totalInches ~/ 12); // Calculate feet
+  int inches = (totalInches % 12).round(); // Calculate remaining inches
+  return Height(foot: feet, inch: inches);
+}
+
+double feetInchesToCm({required int foot, required int inch}) {
+  double totalInches = ((foot * 12) + inch).toDouble(); // Convert feet and inches to total inches
+  return totalInches * 2.54; // Convert inches to cm
 }

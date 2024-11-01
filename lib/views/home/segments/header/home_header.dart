@@ -4,7 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 
-import '../../../widgets/widgets.dart';
+import '../../../../widgets/widgets.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});

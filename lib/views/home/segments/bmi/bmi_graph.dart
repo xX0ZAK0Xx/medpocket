@@ -6,9 +6,9 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/blocs/show_bmi/show_bmi_bloc.dart';
 import 'package:medpocket/utils/app_convert_datetime.dart';
 
-import '../../../configs/app_sizes.dart';
-import '../../../configs/colors.dart';
-import '../../../widgets/widgets.dart';
+import '../../../../configs/app_sizes.dart';
+import '../../../../configs/colors.dart';
+import '../../../../widgets/widgets.dart';
 import 'dart:math';
 
 import 'bmi_class.dart';

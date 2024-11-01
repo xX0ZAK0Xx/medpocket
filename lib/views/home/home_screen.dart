@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medpocket/configs/app_sizes.dart';
-import 'package:medpocket/views/home/segments/bmi_graph.dart';
-import 'package:medpocket/views/home/segments/home_header.dart';
-import 'package:medpocket/views/home/segments/your_health.dart';
+import 'package:medpocket/views/home/segments/header/home_header.dart';
+import 'package:medpocket/views/home/segments/your_health/your_health.dart';
+
+import 'segments/bmi/bmi_graph.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
