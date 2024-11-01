@@ -10,6 +10,7 @@ import 'package:medpocket/widgets/widgets.dart';
 
 import '../../blocs/bloc.dart';
 import '../../configs/colors.dart';
+import '../views.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -21,6 +22,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final passwordBloc = PasswordBloc();
 
@@ -29,6 +31,7 @@ class _SignUpState extends State<SignUp> {
     super.dispose();
     passwordController.dispose();
     emailController.dispose();
+    nameController.dispose();
     formKey.currentState?.reset();
   }
 
@@ -47,13 +50,13 @@ class _SignUpState extends State<SignUp> {
           // if(true){
           //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
           // }else{
-          //   AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+            AppRoutes.pushAndRemoveUntil(context, const RootScreen());
           // }
         }
       },
       child: Scaffold(
         body: Hero(
-          tag: 'plane_image',
+          tag: 'auth_bg_image',
           child: Stack(
             children: [
               // Background plane image with scale
@@ -91,7 +94,7 @@ class _SignUpState extends State<SignUp> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
                           child: Container(
-                            height: 300.h,
+                            height: 350.h,
                             padding: EdgeInsets.all(AppSizes.bodyPadding),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.8), 
@@ -111,6 +114,20 @@ class _SignUpState extends State<SignUp> {
                                     key: formKey,
                                     child: Column(
                                       children: [
+                                        AppTextField(
+                                          textInputAction: TextInputAction.next,
+                                          labelText: "Name", 
+                                          hintText: "Enter your Name", 
+                                          keyboardType: TextInputType.emailAddress, 
+                                          controller: nameController,
+                                          isRequired: true,
+                                          labelColor: AppColors.textColorw1,
+                                          hintColor: AppColors.textColorw3,
+                                          fillColor: AppColors.bg.withOpacity(0.1),
+                                          textColor: AppColors.textColorw1,
+                                          validator: (p0) => p0!.isEmpty ? "Please enter your name" : null,
+                                        ),
+                                        SizedBox(height: AppSizes.bodyPadding,),
                                         AppTextField(
                                           textInputAction: TextInputAction.next,
                                           labelText: "Email", 
@@ -173,7 +190,7 @@ class _SignUpState extends State<SignUp> {
                                 ),
                                 AppButton(text: "Sign Up", press: (){
                                   if(formKey.currentState!.validate()){
-                                    context.read<AuthBloc>().add(SignUpEvent(email: emailController.text, password:passwordController.text,));
+                                    context.read<AuthBloc>().add(SignUpEvent(email: emailController.text.trim(), password:passwordController.text.trim(), name: nameController.text.trim(),));
                                     // appLoadingDialog(context);
                                     // appErrorDialog(context, "sefkglk");
                                   }

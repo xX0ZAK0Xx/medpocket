@@ -12,9 +12,9 @@ class LoginEvent extends AuthEvent{
 }
 //!SignUp
 class SignUpEvent extends AuthEvent{
-  final String email, password;
+  final String email, password, name;
 
-  SignUpEvent({required this.email, required this.password});
+  SignUpEvent({required this.name, required this.email, required this.password});
 }
 
 //!Logout

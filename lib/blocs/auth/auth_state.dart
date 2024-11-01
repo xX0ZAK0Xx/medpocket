@@ -13,7 +13,7 @@ final class PreviousAuthErrorState extends AuthActionState {
 }
 
 
-//?Normal Login
+//?Authentication
 final class AuthLoadingState extends AuthActionState {}
 final class AuthSuccessState extends AuthActionState {}
 final class AuthErrorState extends AuthActionState {

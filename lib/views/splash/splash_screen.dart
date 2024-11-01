@@ -87,7 +87,7 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
             // if(user?.emailVerified == false){
             //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
             // }else{
-            //   AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+              AppRoutes.pushAndRemoveUntil(context, const RootScreen());
             // }
           }
         },
@@ -95,7 +95,7 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
           children: [
             // Plane image with zoom and slide animations
             Hero(
-              tag: 'plane_image',
+              tag: 'auth_bg_image',
               child: AnimatedBuilder(
                 animation: _animationController,
                 builder: (context, child) {

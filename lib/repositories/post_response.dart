@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 // import 'package:medpocket/configs/app_urls.dart';
 
 import '../configs/app_constants.dart';
-import '../configs/app_urls.dart';
 
 Future<String> postResponse({
   required String url,
@@ -17,7 +16,6 @@ Future<String> postResponse({
   final Map<String, String> header = {
     "Content-Type": "application/json",
     if (token != null) "Authorization": "Bearer $token",
-    "agency": AppUrls.b2bToken
   };
 
   try {

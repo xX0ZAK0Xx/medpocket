@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:bloc/bloc.dart';
+import 'package:medpocket/repositories/post_response.dart';
 import '../../configs/app_constants.dart';
+import '../../configs/app_urls.dart';
 import '../../database/local_db.dart';
 import '../../models/model.dart';
 
@@ -10,7 +13,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   String? email, password, token, name, phone;
-  LoginModel? loginModel;
+  AuthModel? authModel;
   ResponseModel? responseModel;
 
   AuthBloc() : super(PreviousLoginInitial()) {
@@ -31,13 +34,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         logger.f("message myData: ${myData.length}");
         email = myData[0];
         password = myData[1];
-
-        await _handleSignIn(
-          email: email!,
-          password: password!,
-          onSuccess: () => emit(AuthSuccessState()),
-          onError: (message) => emit(AuthErrorState(errorMessage: message)),
-        );
+        final payload = {
+        "email": email,
+        "password": password
+        };
+        final res = await postResponse(url: AppUrls.login, payload: payload);
+        final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
+        if(authModel.success == true) {
+          emit(AuthSuccessState());
+        }else{
+          emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
+        }
       }
     } catch (e) {
       logger.e("Error during fetch login data: $e");
@@ -47,42 +54,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   FutureOr<void> loginEvent(LoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
-
     try {
-      await _handleSignIn(
-        email: event.email,
-        password: event.password,
-        onSuccess: () {
-          emit(AuthSuccessState());
-          LocalDB.postLoginInfo(email: event.email, password: event.password);
-        },
-        onError: (message) => emit(AuthErrorState(errorMessage: message)),
-      );
+      final payload = {
+        "email": event.email,
+        "password": event.password
+      };
+      final res = await postResponse(url: AppUrls.login, payload: payload);
+      final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
+      if(authModel.success == true) {
+        emit(AuthSuccessState());
+        LocalDB.postLoginInfo(email: event.email, password: event.password);
+      }else{
+        emit(AuthErrorState(errorMessage: authModel.message??""));
+      }
     } catch (e) {
       logger.e("Login error: $e");
       emit(AuthErrorState(errorMessage: "Login failed. Please try again."));
     }
   }
 
-  Future<void> _handleSignIn({
-    required String email,
-    required String password,
-    required Function() onSuccess,
-    required Function(String) onError,
-  }) async {
-    try {
-      
-    } catch (e) {
-      // Log and catch all other exceptions
-      logger.e("Unknown error occurred: $e");
-      onError("An unknown error occurred. Please try again.");
-    }
-  }
+  
 
 
   Future<void> signUpEvent(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
+      final payload = {
+        "email": event.email,
+        "password": event.password,
+        "name": event.name,
+      };
+      final res = await postResponse(url: AppUrls.signup, payload: payload);
+      final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
+      if(authModel.success == true) {
+        emit(AuthSuccessState());
+        LocalDB.postLoginInfo(email: event.email, password: event.password);
+      }else{
+        emit(AuthErrorState(errorMessage: authModel.message??""));
+      }
     } catch (e) {
       logger.e(e);
       emit(AuthErrorState(errorMessage: "An error occurred: $e"));
@@ -100,7 +109,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> passwordResetEvent(PasswordResetEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState()); // Optional: Emit loading state if needed
     try {
-
+    //   await FirebaseAuth.instance.sendPasswordResetEmail(email: event.email);
+    //   logger.i("Password reset email sent successfully");
+    //   emit(PasswordResetSuccessState());
+    // } on FirebaseAuthException catch (e) {
+    //   logger.e("Error sending password reset email: ${e.message}");
+    //   if (e.code == 'user-not-found') {
+    //     emit(PasswordResetErrorState(errorMessage: "No user found for that email."));
+    //   } else {
+    //     emit(PasswordResetErrorState(errorMessage: "Failed to send password reset email. Please try again."));
+    //   }
     } catch (e) {
       logger.e("Unknown error occurred: $e");
       emit(PasswordResetErrorState(errorMessage: "An unknown error occurred. Please try again."));

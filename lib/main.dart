@@ -10,7 +10,8 @@ import 'views/views.dart';
 Future<void> main() async {
   //!for local db
   WidgetsFlutterBinding.ensureInitialized();
-
+  ScreenUtil.ensureScreenSize();
+  
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarIconBrightness: Brightness.light,

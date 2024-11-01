@@ -1,97 +1,63 @@
 import 'dart:convert';
 
-LoginModel loginModelFromJson(String str) => LoginModel.fromJson(json.decode(str));
+import '../model.dart';
 
-String loginModelToJson(LoginModel data) => json.encode(data.toJson());
+AuthModel authModelFromJson(String str) => AuthModel.fromJson(json.decode(str));
 
-class LoginModel {
+String loginModelToJson(AuthModel data) => json.encode(data.toJson());
+
+class AuthModel {
     final bool? success;
+    final int? status;
     final String? message;
     final Data? data;
-    final String? token;
+    final Meta? meta;
 
-    LoginModel({
+    AuthModel({
         this.success,
+        this.status,
         this.message,
         this.data,
-        this.token,
+        this.meta,
     });
 
-    factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
+    factory AuthModel.fromJson(Map<String, dynamic> json) => AuthModel(
         success: json["success"],
+        status: json["status"],
         message: json["message"],
         data: json["data"] == null ? null : Data.fromJson(json["data"]),
-        token: json["token"],
+        meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
     );
 
     Map<String, dynamic> toJson() => {
         "success": success,
+        "status": status,
         "message": message,
         "data": data?.toJson(),
-        "token": token,
+        "meta": meta?.toJson(),
     };
 }
 
 class Data {
-    final int? id;
+    final String? id;
     final String? name;
     final String? email;
-    final String? mobileNumber;
-    final String? photo;
-    final String? uniqueId;
-    final DateTime? createdAt;
-    final int? agencyId;
-    final dynamic refId;
-    final String? agencyName;
-    final String? btocCommission;
-    final String? agencyLogo;
-    final int? roleId;
 
     Data({
         this.id,
         this.name,
         this.email,
-        this.mobileNumber,
-        this.photo,
-        this.uniqueId,
-        this.createdAt,
-        this.agencyId,
-        this.refId,
-        this.agencyName,
-        this.btocCommission,
-        this.agencyLogo,
-        this.roleId,
     });
 
     factory Data.fromJson(Map<String, dynamic> json) => Data(
-        id: json["id"],
+        id: json["_id"],
         name: json["name"],
         email: json["email"],
-        mobileNumber: json["mobile_number"],
-        photo: json["photo"],
-        uniqueId: json["unique_id"],
-        createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-        agencyId: json["agency_id"],
-        refId: json["ref_id"],
-        agencyName: json["agency_name"],
-        btocCommission: json["btoc_commission"],
-        agencyLogo: json["agency_logo"],
-        roleId: json["role_id"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id,
+        "_id": id,
         "name": name,
         "email": email,
-        "mobile_number": mobileNumber,
-        "photo": photo,
-        "unique_id": uniqueId,
-        "created_at": createdAt?.toIso8601String(),
-        "agency_id": agencyId,
-        "ref_id": refId,
-        "agency_name": agencyName,
-        "btoc_commission": btocCommission,
-        "agency_logo": agencyLogo,
-        "role_id": roleId,
     };
 }

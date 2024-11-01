@@ -14,7 +14,7 @@ class EmailSent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Hero(
-        tag: 'plane_image',
+        tag: 'auth_bg_image',
         child: Stack(
           children: [
             // Background plane image with scale

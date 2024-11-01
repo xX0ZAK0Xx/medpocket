@@ -43,7 +43,7 @@ class _ForgotPassState extends State<ForgotPass> {
           }
         },
         child: Hero(
-              tag: 'plane_image',
+              tag: 'auth_bg_image',
               child: Stack(
                 children: [
                   // Background plane image with scale
