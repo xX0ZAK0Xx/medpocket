@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
@@ -7,7 +6,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/utils/app_validations.dart';
-import 'package:medpocket/views/views.dart';
 import 'package:medpocket/widgets/widgets.dart';
 
 import '../../blocs/bloc.dart';
@@ -46,14 +44,11 @@ class _SignUpState extends State<SignUp> {
           appErrorDialog(context, state.errorMessage);
         } else if(state is AuthSuccessState){
           AppRoutes.pop(context);
-          final user = FirebaseAuth.instance.currentUser;
-          if(user?.emailVerified == false){
-            AppRoutes.pushAndRemoveUntil(context, VerifiyEmail());
-          }else if(user?.displayName == null || user?.phoneNumber == null || user?.photoURL == null){
-            AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
-          }else{
-            AppRoutes.pushAndRemoveUntil(context, const RootScreen());
-          }
+          // if(true){
+          //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
+          // }else{
+          //   AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+          // }
         }
       },
       child: Scaffold(

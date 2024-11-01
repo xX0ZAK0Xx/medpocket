@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../configs/app_constants.dart';
 import '../../database/local_db.dart';
 import '../../models/model.dart';
@@ -72,34 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required Function(String) onError,
   }) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password)
-          .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw TimeoutException("Connection timed out. Please try again.");
-      });
-
-      if (userCredential.user != null) {
-        logger.i("Logged in: ${userCredential.user?.email} ${userCredential.user?.displayName}");
-        onSuccess();
-      } else {
-        onError("Login failed. Please try again.");
-      }
-    } on FirebaseAuthException catch (e) {
-      // Handle Firebase-specific exceptions
-      if (e.code == 'user-not-found') {
-        logger.e('No user found for that email.');
-        onError("No user found for that email.");
-      } else if (e.code == 'wrong-password') {
-        logger.e('Wrong password provided for that user.');
-        onError("Wrong password provided for that user.");
-      } else {
-        // Log all other FirebaseAuthException cases
-        logger.e("FirebaseAuthException: ${e.message}");
-        onError("An error occurred: ${e.message}");
-      }
-    } on TimeoutException catch (_) {
-      logger.e("Login timeout.");
-      onError("Login timeout. Please check your internet connection.");
+      
     } catch (e) {
       // Log and catch all other exceptions
       logger.e("Unknown error occurred: $e");
@@ -111,31 +83,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> signUpEvent(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: event.email,
-            password: event.password,
-          )
-          .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw TimeoutException("Connection timed out. Please try again.");
-      });
-
-      if (userCredential.user != null) {
-        emit(AuthSuccessState());
-        LocalDB.postLoginInfo(email: event.email, password: event.password);
-      } else {
-        emit(AuthErrorState(errorMessage: "Something went wrong"));
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        logger.e('The password provided is too weak.');
-        emit(AuthErrorState(errorMessage: "The password provided is too weak."));
-      } else if (e.code == 'email-already-in-use') {
-        logger.e('The account already exists for that email.');
-        emit(AuthErrorState(errorMessage: "The account already exists for that email."));
-      }
-    } on TimeoutException catch (_) {
-      emit(AuthErrorState(errorMessage: "Sign-up timeout. Please try again."));
     } catch (e) {
       logger.e(e);
       emit(AuthErrorState(errorMessage: "An error occurred: $e"));
@@ -153,16 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> passwordResetEvent(PasswordResetEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState()); // Optional: Emit loading state if needed
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: event.email);
-      logger.i("Password reset email sent successfully");
-      emit(PasswordResetSuccessState());
-    } on FirebaseAuthException catch (e) {
-      logger.e("Error sending password reset email: ${e.message}");
-      if (e.code == 'user-not-found') {
-        emit(PasswordResetErrorState(errorMessage: "No user found for that email."));
-      } else {
-        emit(PasswordResetErrorState(errorMessage: "Failed to send password reset email. Please try again."));
-      }
+
     } catch (e) {
       logger.e("Unknown error occurred: $e");
       emit(PasswordResetErrorState(errorMessage: "An unknown error occurred. Please try again."));

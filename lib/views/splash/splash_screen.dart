@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -85,14 +84,11 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
               duration: const Duration(seconds: 1),
             ));
           } else if(state is AuthSuccessState){
-            final user = FirebaseAuth.instance.currentUser;
-            if(user?.emailVerified == false){
-              AppRoutes.pushAndRemoveUntil(context, VerifiyEmail());
-            }else if(user?.displayName == null || user?.phoneNumber == null || user?.photoURL == null){
-              AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
-            }else{
-              AppRoutes.pushAndRemoveUntil(context, const RootScreen());
-            }
+            // if(user?.emailVerified == false){
+            //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
+            // }else{
+            //   AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+            // }
           }
         },
         child: Stack(
