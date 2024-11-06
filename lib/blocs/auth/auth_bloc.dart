@@ -41,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final res = await postResponse(url: AppUrls.login, payload: payload);
         final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
         if(authModel.success == true) {
-          emit(AuthSuccessState());
+          emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
           LocalDB.setId(id: authModel.data?.id??"");
         }else{
           emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
@@ -63,7 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final res = await postResponse(url: AppUrls.login, payload: payload);
       final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
       if(authModel.success == true) {
-        emit(AuthSuccessState());
+        emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
         LocalDB.postLoginInfo(email: event.email, password: event.password);
         LocalDB.setId(id: authModel.data?.id??"");
       }else{
@@ -89,7 +89,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final res = await postResponse(url: AppUrls.signup, payload: payload);
       final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
       if(authModel.success == true) {
-        emit(AuthSuccessState());
+        emit(AuthSuccessState(allDone: false));
         LocalDB.postLoginInfo(email: event.email, password: event.password);
       }else{
         emit(AuthErrorState(errorMessage: authModel.message??""));

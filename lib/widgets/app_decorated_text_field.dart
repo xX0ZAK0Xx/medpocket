@@ -60,7 +60,7 @@ class AppDecoratedTextField extends StatelessWidget {
       onTap: onTap, // Ensure the onTap works here
       child: Container(
         height: 60.h,
-        padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 2),
+        padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 4),
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 225, 228, 235),
           borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig * 1.5),

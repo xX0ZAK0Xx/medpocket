@@ -45,11 +45,11 @@ class _SignInScreenState extends State<SignInScreen> {
           appErrorDialog(context, state.errorMessage);
         } else if(state is AuthSuccessState){
           AppRoutes.pop(context);
-          // if(true){
-          //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
-          // }else{
+          if(state.allDone){
             AppRoutes.pushAndRemoveUntil(context, const RootScreen());
-          // }
+          }else{
+            AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
+          }
         }
       },
       child: Scaffold(
@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
                           child: Container(
-                            height: 350.h,
+                            height: 300.h,
                             padding: EdgeInsets.all(AppSizes.bodyPadding),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.8), 

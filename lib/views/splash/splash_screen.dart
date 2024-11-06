@@ -84,11 +84,11 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
               duration: const Duration(seconds: 1),
             ));
           } else if(state is AuthSuccessState){
-            // if(user?.emailVerified == false){
-            //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
-            // }else{
+            if(state.allDone){
               AppRoutes.pushAndRemoveUntil(context, const RootScreen());
-            // }
+            }else{
+              AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
+            }
           }
         },
         child: Stack(

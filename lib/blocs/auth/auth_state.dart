@@ -15,7 +15,11 @@ final class PreviousAuthErrorState extends AuthActionState {
 
 //?Authentication
 final class AuthLoadingState extends AuthActionState {}
-final class AuthSuccessState extends AuthActionState {}
+final class AuthSuccessState extends AuthActionState {
+  final bool allDone;
+
+  AuthSuccessState({required this.allDone});
+}
 final class AuthErrorState extends AuthActionState {
   final String errorMessage;
 

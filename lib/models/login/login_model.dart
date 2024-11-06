@@ -10,7 +10,7 @@ class AuthModel {
     final bool? success;
     final int? status;
     final String? message;
-    final Data? data;
+    final AuthData? data;
     final Meta? meta;
 
     AuthModel({
@@ -25,7 +25,7 @@ class AuthModel {
         success: json["success"],
         status: json["status"],
         message: json["message"],
-        data: json["data"] == null ? null : Data.fromJson(json["data"]),
+        data: json["data"] == null ? null : AuthData.fromJson(json["data"]),
         meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
     );
 
@@ -38,26 +38,30 @@ class AuthModel {
     };
 }
 
-class Data {
+class AuthData {
     final String? id;
     final String? name;
     final String? email;
+    final bool? allSetup;
 
-    Data({
+    AuthData({
         this.id,
+        this.allSetup,
         this.name,
         this.email,
     });
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory AuthData.fromJson(Map<String, dynamic> json) => AuthData(
         id: json["_id"],
         name: json["name"],
         email: json["email"],
+        allSetup: json["all_setup"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
         "email": email,
+        "all_setup": allSetup,
     };
 }

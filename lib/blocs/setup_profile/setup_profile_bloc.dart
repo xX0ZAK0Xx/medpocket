@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:isolate';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:medpocket/configs/app_urls.dart';
 import 'package:medpocket/database/local_db.dart';
-import 'package:medpocket/models/common/common_mod.dart';
+import 'package:medpocket/models/model.dart';
+import 'package:medpocket/repositories/get_response.dart';
 import 'package:medpocket/repositories/post_response.dart';
 
 import '../../configs/app_constants.dart';
@@ -14,21 +16,29 @@ part 'setup_profile_event.dart';
 part 'setup_profile_state.dart';
 
 class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
-  int height = 160;
+  int feet = 5;
+  int inch = 5;
   int weight = 60;
   String bloodGroup = 'A+', gender = 'Male';
   SetupProfileBloc() : super(SetupProfileInitial()) {
-    on<ChangeHeightEvent>(changeHeightEvent);
+    on<ChangeFeetEvent>(changeHeightEvent);
+    on<ChangeInchEvent>(changeInchEvent);
     on<ChangeWeightEvent>(changeWeightEvent);
     on<SelecteBloodGroupEvent>(selecteBloodGroupEvent);
     on<SelecteGenderEvent>(selecteGenderEvent);
 
     on<CreateSetupProfileEvent>(createSetupProfileEvent);
+    on<GetProfileEvent>(getProfileEvent);
   }
 
-  FutureOr<void> changeHeightEvent(ChangeHeightEvent event, Emitter<SetupProfileState> emit) {
-    height = event.height;
-    emit(ChangeHeightState());
+  FutureOr<void> changeHeightEvent(ChangeFeetEvent event, Emitter<SetupProfileState> emit) {
+    feet = event.feet;
+    emit(ChangeFeetState());
+  }
+  
+  FutureOr<void> changeInchEvent(ChangeInchEvent event, Emitter<SetupProfileState> emit) {
+    inch = event.inch;
+    emit(ChangeInchState());
   }
 
 
@@ -59,17 +69,35 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
         "height" : event.height.toString(),
         "weight" : event.weight.toString(),
       };
+      logger.d("payload: $payload");
       final res = await postImageResponse(url: AppUrls.profileSetup(id: await LocalDB.getId()??""), payload: payload, token: "", photoPath: {"file": event.image});
       final ResponseModel responseModel = await Isolate.run(()=> responseModelFromJson(res));
       if(responseModel.success == true){
         emit(CreateSetupProfileSuccessState());
       }else{
-        logger.e(responseModel.message);
+        log(responseModel.message.toString());
         emit(CreateSetupProfileFailedState(errorMessage: responseModel.message??"Something went wrong"));
       }
     } catch (e) {
       logger.e(e.toString());
       emit(CreateSetupProfileFailedState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  FutureOr<void> getProfileEvent(GetProfileEvent event, Emitter<SetupProfileState> emit) async {
+    emit(GetProfileLoadingState());
+    try {
+      final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), token: "", from: 'Get Profile');
+      final ProfileModel responseModel = await Isolate.run(()=> profileModelFromJson(res));
+      if(responseModel.success == true){
+        emit(GetProfileSuccessState(data: responseModel.data??ProfileData()));
+      }else{
+        logger.e(responseModel.message);
+        emit(GetProfileFailedState(errorMessage: responseModel.message??"Something went wrong"));
+      }
+    } catch (e) {
+      logger.e(e.toString());
+      emit(GetProfileFailedState(errorMessage: "Something went wrong"));
     }
   }
 }

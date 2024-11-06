@@ -94,7 +94,7 @@ class _SignUpState extends State<SignUp> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust the blur intensity
                           child: Container(
-                            height: 350.h,
+                            height: 300.h,
                             padding: EdgeInsets.all(AppSizes.bodyPadding),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.8), 
@@ -114,20 +114,20 @@ class _SignUpState extends State<SignUp> {
                                     key: formKey,
                                     child: Column(
                                       children: [
-                                        AppTextField(
-                                          textInputAction: TextInputAction.next,
-                                          labelText: "Name", 
-                                          hintText: "Enter your Name", 
-                                          keyboardType: TextInputType.emailAddress, 
-                                          controller: nameController,
-                                          isRequired: true,
-                                          labelColor: AppColors.textColorw1,
-                                          hintColor: AppColors.textColorw3,
-                                          fillColor: AppColors.bg.withOpacity(0.1),
-                                          textColor: AppColors.textColorw1,
-                                          validator: (p0) => p0!.isEmpty ? "Please enter your name" : null,
-                                        ),
-                                        SizedBox(height: AppSizes.bodyPadding,),
+                                        // AppTextField(
+                                        //   textInputAction: TextInputAction.next,
+                                        //   labelText: "Name", 
+                                        //   hintText: "Enter your Name", 
+                                        //   keyboardType: TextInputType.emailAddress, 
+                                        //   controller: nameController,
+                                        //   isRequired: true,
+                                        //   labelColor: AppColors.textColorw1,
+                                        //   hintColor: AppColors.textColorw3,
+                                        //   fillColor: AppColors.bg.withOpacity(0.1),
+                                        //   textColor: AppColors.textColorw1,
+                                        //   validator: (p0) => p0!.isEmpty ? "Please enter your name" : null,
+                                        // ),
+                                        // SizedBox(height: AppSizes.bodyPadding,),
                                         AppTextField(
                                           textInputAction: TextInputAction.next,
                                           labelText: "Email", 

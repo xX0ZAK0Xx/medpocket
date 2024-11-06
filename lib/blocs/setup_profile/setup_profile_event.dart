@@ -3,10 +3,15 @@ part of 'setup_profile_bloc.dart';
 @immutable
 sealed class SetupProfileEvent {}
 
-class ChangeHeightEvent extends SetupProfileEvent{
-  final int height;
+class ChangeFeetEvent extends SetupProfileEvent{
+  final int feet;
 
-  ChangeHeightEvent({required this.height});
+  ChangeFeetEvent({required this.feet});
+}
+class ChangeInchEvent extends SetupProfileEvent{
+  final int inch;
+
+  ChangeInchEvent({required this.inch});
 }
 
 class ChangeWeightEvent extends SetupProfileEvent{
@@ -29,7 +34,10 @@ class SelecteGenderEvent extends SetupProfileEvent{
 
 class CreateSetupProfileEvent extends SetupProfileEvent{
   final String fullName, phoneNumber, bloodGroup, dateOfBirth, gender, image;
-  final double height, weight;
+  final double height;
+  final int weight;
 
   CreateSetupProfileEvent({required this.fullName, required this.phoneNumber, required this.bloodGroup, required this.dateOfBirth, required this.gender, required this.image, required this.height, required this.weight});
 }
+
+class GetProfileEvent extends SetupProfileEvent{}

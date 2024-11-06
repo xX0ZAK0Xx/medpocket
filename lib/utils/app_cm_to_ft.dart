@@ -20,5 +20,5 @@ Height cmToFeetInches(double cm) {
 
 double feetInchesToCm({required int foot, required int inch}) {
   double totalInches = ((foot * 12) + inch).toDouble(); // Convert feet and inches to total inches
-  return totalInches * 2.54; // Convert inches to cm
+  return double.tryParse((totalInches * 2.54).toStringAsFixed(2))??0; // Convert inches to cm
 }
