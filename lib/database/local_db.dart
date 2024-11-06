@@ -15,6 +15,16 @@ class LocalDB {
     await prefs.setString('password_med_pocket', password);
   }
 
+  //!Get id 
+  static Future<String?> getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('id_med_pocket')?? "";
+  }
+  //!Get id 
+  static Future<void> setId({required String id}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('id_med_pocket', id);
+  }
   //!Get Token 
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

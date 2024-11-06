@@ -26,3 +26,10 @@ class SelecteGenderEvent extends SetupProfileEvent{
 
   SelecteGenderEvent({required this.gender});
 }
+
+class CreateSetupProfileEvent extends SetupProfileEvent{
+  final String fullName, phoneNumber, bloodGroup, dateOfBirth, gender, image;
+  final double height, weight;
+
+  CreateSetupProfileEvent({required this.fullName, required this.phoneNumber, required this.bloodGroup, required this.dateOfBirth, required this.gender, required this.image, required this.height, required this.weight});
+}

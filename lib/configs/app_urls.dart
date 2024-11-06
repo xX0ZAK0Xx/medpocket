@@ -14,4 +14,7 @@ class AppUrls {
   static const String verifyOtp = "$baseUrl/public/otp/match";
   static const String resetPassword = "$baseUrl/btob/auth/reset-password";
 
+  //!Profile
+  static String profile({required String id}) => "$baseUrl/api/user/profile${"/$id"}";
+  static String profileSetup({required String id}) => "$baseUrl/api/user/profile-setup${"/$id"}";
 }

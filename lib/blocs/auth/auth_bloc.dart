@@ -42,6 +42,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
         if(authModel.success == true) {
           emit(AuthSuccessState());
+          LocalDB.setId(id: authModel.data?.id??"");
         }else{
           emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
         }
@@ -64,6 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if(authModel.success == true) {
         emit(AuthSuccessState());
         LocalDB.postLoginInfo(email: event.email, password: event.password);
+        LocalDB.setId(id: authModel.data?.id??"");
       }else{
         emit(AuthErrorState(errorMessage: authModel.message??""));
       }

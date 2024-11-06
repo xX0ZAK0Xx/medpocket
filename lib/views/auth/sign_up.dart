@@ -48,9 +48,9 @@ class _SignUpState extends State<SignUp> {
         } else if(state is AuthSuccessState){
           AppRoutes.pop(context);
           // if(true){
-          //   AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
+            AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
           // }else{
-            AppRoutes.pushAndRemoveUntil(context, const RootScreen());
+            // AppRoutes.pushAndRemoveUntil(context, const RootScreen());
           // }
         }
       },
