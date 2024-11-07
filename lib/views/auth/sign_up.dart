@@ -22,7 +22,6 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final passwordBloc = PasswordBloc();
 
@@ -31,7 +30,6 @@ class _SignUpState extends State<SignUp> {
     super.dispose();
     passwordController.dispose();
     emailController.dispose();
-    nameController.dispose();
     formKey.currentState?.reset();
   }
 
@@ -190,7 +188,7 @@ class _SignUpState extends State<SignUp> {
                                 ),
                                 AppButton(text: "Sign Up", press: (){
                                   if(formKey.currentState!.validate()){
-                                    context.read<AuthBloc>().add(SignUpEvent(email: emailController.text.trim(), password:passwordController.text.trim(), name: nameController.text.trim(),));
+                                    context.read<AuthBloc>().add(SignUpEvent(email: emailController.text.trim(), password:passwordController.text.trim()));
                                     // appLoadingDialog(context);
                                     // appErrorDialog(context, "sefkglk");
                                   }

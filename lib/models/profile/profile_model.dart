@@ -45,8 +45,10 @@ class ProfileData {
     final String? bloodGroup;
     final DateTime? dateOfBirth;
     final String? gender;
+    final String? imageUrl;
 
     ProfileData({
+        this.imageUrl,
         this.name,
         this.phoneNumber,
         this.email,
@@ -59,6 +61,7 @@ class ProfileData {
         name: json["name"],
         phoneNumber: json["phone_number"],
         email: json["email"],
+        imageUrl: json["image_url"],
         bloodGroup: json["blood_group"],
         dateOfBirth: json["date_of_birth"] == null ? null : DateTime.parse(json["date_of_birth"]),
         gender: json["gender"],
@@ -67,6 +70,7 @@ class ProfileData {
     Map<String, dynamic> toJson() => {
         "name": name,
         "phone_number": phoneNumber,
+        "image_url": imageUrl,
         "email": email,
         "blood_group": bloodGroup,
         "date_of_birth": dateOfBirth?.toIso8601String(),

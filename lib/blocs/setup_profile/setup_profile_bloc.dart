@@ -87,7 +87,7 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
   FutureOr<void> getProfileEvent(GetProfileEvent event, Emitter<SetupProfileState> emit) async {
     emit(GetProfileLoadingState());
     try {
-      final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), token: "", from: 'Get Profile');
+      final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), from: 'Get Profile');
       final ProfileModel responseModel = await Isolate.run(()=> profileModelFromJson(res));
       if(responseModel.success == true){
         emit(GetProfileSuccessState(data: responseModel.data??ProfileData()));

@@ -84,7 +84,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final payload = {
         "email": event.email,
         "password": event.password,
-        "name": event.name,
       };
       final res = await postResponse(url: AppUrls.signup, payload: payload);
       final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
