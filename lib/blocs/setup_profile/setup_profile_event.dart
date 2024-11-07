@@ -37,7 +37,7 @@ class CreateSetupProfileEvent extends SetupProfileEvent{
   final double height;
   final int weight;
 
-  CreateSetupProfileEvent({required this.fullName, required this.phoneNumber, required this.bloodGroup, required this.dateOfBirth, required this.gender, required this.image, required this.height, required this.weight});
+  CreateSetupProfileEvent({required this.fullName, required this.phoneNumber, required this.bloodGroup, required this.dateOfBirth, required this.gender, this.image = "", required this.height, required this.weight});
 }
 
 class GetProfileEvent extends SetupProfileEvent{}

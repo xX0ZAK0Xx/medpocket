@@ -40,9 +40,9 @@ class HomeHeader extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                             image: 
-                                // profileData.photo != null && profileData.photo != '' ?
-                                 NetworkImage('${state.data.imageUrl}'), 
-                                // const AssetImage('assets/images/avatar.png') as ImageProvider,
+                                state.data.imageUrl != null && state.data.imageUrl != '' ?
+                                 NetworkImage('${state.data.imageUrl}') :
+                                const AssetImage('assets/images/avatar.png') as ImageProvider,
                             fit: BoxFit.cover,
                             onError: (error, stackTrace) {
                               const AssetImage('assets/images/avatar.png');

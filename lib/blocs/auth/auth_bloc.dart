@@ -43,6 +43,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if(authModel.success == true) {
           emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
           LocalDB.setId(id: authModel.data?.id??"");
+          logger.d("Id from init: ${await LocalDB.getId()}");
         }else{
           emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
         }
@@ -71,6 +72,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } catch (e) {
       logger.e("Login error: $e");
+      logger.d("Id from login: ${await LocalDB.getId()}");
       emit(AuthErrorState(errorMessage: "Login failed. Please try again."));
     }
   }
@@ -90,6 +92,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if(authModel.success == true) {
         emit(AuthSuccessState(allDone: false));
         LocalDB.postLoginInfo(email: event.email, password: event.password);
+        LocalDB.setId(id: authModel.data?.id??"");
+        logger.d("Id from sign up: ${await LocalDB.getId()}");
       }else{
         emit(AuthErrorState(errorMessage: authModel.message??""));
       }

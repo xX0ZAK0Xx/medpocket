@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 // import 'package:medpocket/configs/app_urls.dart';
@@ -54,32 +55,41 @@ Future<String> postResponse({
 
 
 
-Future<String> postImageResponse({required String url, required Map<String, String> payload,  Map<String, String>? photoPath, required String token, String? from}) async {
+Future<String> postImageResponse({
+  required String url,
+  required Map<String, String> payload,
+  Map<String, String>? photoPath,
+  required String token,
+  String? from,
+}) async {
   Uri uriUrl = Uri.parse(url);
 
-  final Map<String, String> header = {
-    "Content-Type": "application/json",
-    // 'Authorization': 'Bearer $token',
-  };
+  final Map<String, String> header = {}; // Removed Content-Type
+
   try {
-    var request = http.MultipartRequest('POST', uriUrl); 
+    var request = http.MultipartRequest('POST', uriUrl);
 
     request.fields.addAll(payload);
 
+    // Add files from the photoPath map
     if (photoPath != null && photoPath.isNotEmpty) {
-      // Loop through each key-value pair in the map
-      photoPath.forEach((key, value) async {
-        request.files.add(await http.MultipartFile.fromPath(key, value));
-      });
+      for (var entry in photoPath.entries) {
+        logger.d("key: ${entry.key}, value: ${entry.value}");
+        request.files.add(await http.MultipartFile.fromPath(entry.key, entry.value));
+      }
     }
 
+    // Add headers and authorization if necessary
     request.headers.addAll(header);
+    if (token.isNotEmpty) {
+      request.headers["Authorization"] = "Bearer $token";
+    }
 
+    // Send the request
     http.StreamedResponse response = await request.send();
-
     final respStr = await response.stream.bytesToString();
 
-    logger.i("$from\n postImageResponse respStr: $respStr"); // Updated logging
+    log("respStr: $respStr"); // Updated logging
     return respStr;
   } on TimeoutException {
     return '''
