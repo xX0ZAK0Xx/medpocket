@@ -36,9 +36,8 @@ class _ForgotPassState extends State<ForgotPass> {
         listenWhen: (previous, current) => current is PasswordResetSuccessState,
         listener: (context, state) {
           if (state is AuthLoadingState) {
-            appLoadingDialog(context);
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.loadingSnackbar(title: "Loading", message: "Please wait..."));
           } else if (state is PasswordResetSuccessState){
-            AppRoutes.pop(context);
             AppRoutes.push(context, const EmailSent());
           }
         },

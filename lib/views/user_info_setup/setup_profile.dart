@@ -62,12 +62,10 @@ class _SetupProfileState extends State<SetupProfile> {
         listenWhen: (previous, current) => current is CreateSetupProfileFailedState || current is CreateSetupProfileLoadingState || current is CreateSetupProfileSuccessState,
         listener: (context, state) {
           if(state is CreateSetupProfileLoadingState){
-            appLoadingDialog(context);
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.loadingSnackbar(title: "Please wait", message: "Setting up your profile..."));
           }else if(state is CreateSetupProfileFailedState){
-            AppRoutes.pop(context);
-            appErrorDialog(context, state.errorMessage);
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           }else if(state is CreateSetupProfileSuccessState){
-            AppRoutes.pop(context);
             AppRoutes.pushAndRemoveUntil(context, RootScreen());            
           }
         },

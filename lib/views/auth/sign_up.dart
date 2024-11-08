@@ -39,13 +39,11 @@ class _SignUpState extends State<SignUp> {
       listenWhen: (previous, current) => current is AuthSuccessState || current is AuthErrorState || current is AuthLoadingState,
       listener: (context, state) {
        if(state is AuthLoadingState){
-          appLoadingDialog(context);
+          ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.loadingSnackbar(title: "Loading", message: "Please wait..."));
         } else if(state is AuthErrorState){
-          AppRoutes.pop(context);
-          AppRoutes.pop(context);
-          appErrorDialog(context, state.errorMessage);
+          ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: state.errorMessage));
         } else if(state is AuthSuccessState){
-          AppRoutes.pop(context);
+          // AppRoutes.pop(context);
           // if(true){
             AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
           // }else{

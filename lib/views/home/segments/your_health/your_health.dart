@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as mt;
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/blocs/dashboard/dashboard_bloc.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
+import 'package:medpocket/widgets/app_snackbar.dart';
 import 'package:medpocket/widgets/app_text_style.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import '../../../../blocs/bloc.dart';
+import '../../../../models/model.dart';
 import '../../../../utils/utils.dart';
 
 class YourHealth extends StatelessWidget {
@@ -28,10 +31,28 @@ class YourHealth extends StatelessWidget {
           AppColors.redShadow()
         ]
       ),
-      child: BlocBuilder<DashboardBloc, DashboardState>(
+      child: BlocConsumer<DashboardBloc, DashboardState>(
+        listenWhen: (previous, current) => current is UpdateHeightWeightLoadingState || current is UpdateHeightWeightFailedState || current is UpdateHeightWeightSuccessState,
+        listener: (context, state) {
+          // if (state is UpdateHeightWeightLoadingState) {
+          //   ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.loadingSnackbar(title: "Updating", message: "Updating height and weight..."));
+          // } else 
+          if (state is UpdateHeightWeightFailedState) {
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
+          } else if (state is UpdateHeightWeightSuccessState) {
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Height and weight updated successfully!"));
+            
+            // Trigger dashboard data fetch after successful update
+            context.read<DashboardBloc>().add(GetDashboardEvent());
+          }
+        },
         buildWhen: (previous, current) => current is GetDashboardSuccessState,
         builder: (context, state) {
           if(state is GetDashboardSuccessState){
+          final Height height = cmToFeetInches(state.dashboardData.measurements?.height??0);
+            context.read<SetupProfileBloc>().feet = height.foot;
+            context.read<SetupProfileBloc>().inch = height.inch;
+            context.read<SetupProfileBloc>().weight = state.dashboardData.measurements?.weight??0;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -39,7 +60,7 @@ class YourHealth extends StatelessWidget {
                 SizedBox(height: AppSizes.bodyPadding),
                 Row(
                   children: [
-                    HeightWeightBox(title: "Height", feet: cmToFeetInches(state.dashboardData.measurements?.height??0).foot, inch: cmToFeetInches(state.dashboardData.measurements?.height??0).inch,),
+                    HeightWeightBox(title: "Height", feet: height.foot, inch: height.inch,),
                     SizedBox(width: AppSizes.bodyPadding),
                     HeightWeightBox(title: "Weight", kg: state.dashboardData.measurements?.weight,),
                   ],
@@ -124,7 +145,6 @@ class HeightWeightBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Expanded(
       child: GestureDetector(
         onTap: () => showCupBottomSheet(
@@ -150,8 +170,9 @@ class HeightWeightBox extends StatelessWidget {
                                   axis: Axis.horizontal,
                                   itemCount: 5,
                                   value: context.read<SetupProfileBloc>().feet,
+                                  // value: feet??0,
                                   selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
-                                  minValue: 2,
+                                  minValue: 0,
                                   maxValue: 10,
                                   onChanged: (value) => context.read<SetupProfileBloc>().add(ChangeFeetEvent(feet: value)),
                                   itemWidth: 30.w,
@@ -169,6 +190,7 @@ class HeightWeightBox extends StatelessWidget {
                                   itemHeight: 20.h,
                                   itemCount: 5,
                                   value: context.read<SetupProfileBloc>().inch,
+                                  // value: inch??0,
                                   selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
                                   minValue: 0,
                                   maxValue: 11,
@@ -207,6 +229,7 @@ class HeightWeightBox extends StatelessWidget {
               child: Text('Save', style: myText(fontWeight: FontWeight.bold, color: AppColors.secondary, fontSize: 18.sp).copyWith(fontFamily: "Poppins"),),
               onPressed: () {
                 Navigator.pop(context);
+                context.read<DashboardBloc>().add(UpdateHeightWeightEvent(feet: context.read<SetupProfileBloc>().feet, inch: context.read<SetupProfileBloc>().inch, weight: context.read<SetupProfileBloc>().weight));
               },
             ),
           ],
