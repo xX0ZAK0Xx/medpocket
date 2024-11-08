@@ -20,6 +20,8 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
   int inch = 5;
   int weight = 60;
   String bloodGroup = 'A+', gender = 'Male';
+  String name = "", photopath = "";
+
   SetupProfileBloc() : super(SetupProfileInitial()) {
     on<ChangeFeetEvent>(changeHeightEvent);
     on<ChangeInchEvent>(changeInchEvent);
@@ -88,11 +90,17 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
   }
 
   FutureOr<void> getProfileEvent(GetProfileEvent event, Emitter<SetupProfileState> emit) async {
-    emit(GetProfileLoadingState());
+    if(name.isNotEmpty && photopath.isNotEmpty){
+      emit(GetProfileSuccessState(data: ProfileData(name: name, imageUrl: photopath)));
+    }else{
+      emit(GetProfileLoadingState());
+    }
     try {
       final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), from: 'Get Profile');
       final ProfileModel responseModel = await Isolate.run(()=> profileModelFromJson(res));
       if(responseModel.success == true){
+        name = responseModel.data?.name?? "";
+        photopath = responseModel.data?.imageUrl?? "";
         emit(GetProfileSuccessState(data: responseModel.data??ProfileData()));
       }else{
         logger.e(responseModel.message);
