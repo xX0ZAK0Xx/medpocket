@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 // import 'package:medpocket/configs/app_urls.dart';
 
 import '../configs/app_constants.dart';
@@ -53,8 +54,6 @@ Future<String> postResponse({
   }
 }
 
-
-
 Future<String> postImageResponse({
   required String url,
   required Map<String, String> payload,
@@ -69,13 +68,28 @@ Future<String> postImageResponse({
   try {
     var request = http.MultipartRequest('POST', uriUrl);
 
+    // Add the regular fields (non-file data)
     request.fields.addAll(payload);
 
-    // Add files from the photoPath map
+    // If there are photos to upload, add them to the multipart request
     if (photoPath != null && photoPath.isNotEmpty) {
       for (var entry in photoPath.entries) {
-        logger.d("key: ${entry.key}, value: ${entry.value}");
-        request.files.add(await http.MultipartFile.fromPath(entry.key, entry.value));
+        // Get the file path
+        String filePath = entry.value;
+
+        // Get the MIME type from the file extension
+        String? mimeType = lookupMimeType(filePath);
+
+        logger.d("file: $filePath\nmime: $mimeType");
+        
+        // If the mime type is null, default to 'application/octet-stream'
+        mimeType ??= 'application/octet-stream';
+        
+        // Add the photo to the request
+        request.files.add(await http.MultipartFile.fromPath(
+          entry.key, filePath,
+          contentType: MediaType.parse(mimeType), // Set the correct MIME type
+        ));
       }
     }
 
@@ -87,9 +101,12 @@ Future<String> postImageResponse({
 
     // Send the request
     http.StreamedResponse response = await request.send();
+
+    // Read the response as a string
     final respStr = await response.stream.bytesToString();
 
-    log("respStr: $respStr"); // Updated logging
+    logger.f("Response: $respStr"); // Log the response
+
     return respStr;
   } on TimeoutException {
     return '''

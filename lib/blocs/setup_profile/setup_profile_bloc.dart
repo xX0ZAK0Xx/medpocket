@@ -71,8 +71,8 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
       };
       logger.d("payload: $payload");
       logger.f("url: ${AppUrls.profileSetup(id: await LocalDB.getId()??"")}");
-      // final res = await postImageResponse(url: AppUrls.profileSetup(id: await LocalDB.getId()??""), payload: payload, token: "", photoPath: {"file": event.image});
-      final res = await postImageResponse(url: AppUrls.profileSetup(id: await LocalDB.getId()??""), payload: payload, token: "",);
+      final res = await postImageResponse(url: AppUrls.profileSetup(id: await LocalDB.getId()??""), payload: payload, token: "", photoPath: {"file": event.image});
+      // final res = await postImageResponse(url: AppUrls.profileSetup(id: await LocalDB.getId()??""), payload: payload, token: "",);
         log(res);
       final ResponseModel responseModel = await Isolate.run(()=> responseModelFromJson(res));
       if(responseModel.success == true){
@@ -83,7 +83,7 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
       }
     } catch (e) {
       logger.e(e.toString());
-      emit(CreateSetupProfileFailedState(errorMessage: "Something went wrong"));
+      emit(CreateSetupProfileFailedState(errorMessage: e.toString()));
     }
   }
 

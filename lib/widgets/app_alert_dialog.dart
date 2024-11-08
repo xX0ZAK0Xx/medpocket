@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:lottie/lottie.dart';
+import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/widgets/app_text_style.dart';
 
 import '../configs/colors.dart';
@@ -76,6 +77,11 @@ Future<void> appLoadingDialog(BuildContext context) {
 Future<void> appErrorDialog(BuildContext context, String? message) {
   return appAlertDialog(
     context,
+    actions: [
+      CupertinoButton(child: Text("Close", style: myText(color: AppColors.red, fontWeight: FontWeight.w500).copyWith(fontFamily: "Poppins"),), onPressed: (){
+        AppRoutes.pop(context);
+      })
+    ],
     content: SizedBox(
       height: 100.h,
       width: 150.w,

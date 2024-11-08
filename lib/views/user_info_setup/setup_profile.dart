@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -75,42 +77,42 @@ class _SetupProfileState extends State<SetupProfile> {
             padding: EdgeInsets.all(AppSizes.bodyPadding),
             children: [
               // Image Picker
-              // BlocBuilder<ImageBloc, ImageState>(
-              //   bloc: imageBloc,
-              //   builder: (context, state) {
-              //     return GestureDetector(
-              //       onTap: () => showImageSourceSheet(context, imageBloc, "profile"),
-              //       child: ClipRRect(
-              //         borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
-              //         child: Container(
-              //           height: 250.h,
-              //           width: double.maxFinite,
-              //           decoration: BoxDecoration(
-              //             border: Border.all(color: state is ImageNotSelectState ? AppColors.red : Colors.grey),
-              //             borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
-              //           ),
-              //           child: imageBloc.resizedImagePath.isNotEmpty
-              //             ? Image.file(
-              //                 File(imageBloc.resizedImagePath), 
-              //                 fit: BoxFit.cover,
-              //               )
-              //             : Column(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 Icon(Icons.camera_alt, size: 50.sp, color: state is ImageNotSelectState ? AppColors.red : Colors.grey),
-              //                 SizedBox(height: AppSizes.bodyPadding),
-              //                 Text("Profile Photo", style: myText(color: state is ImageNotSelectState ? AppColors.red : Colors.grey)),
-              //               ],
-              //             ),
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // ),
+              BlocBuilder<ImageBloc, ImageState>(
+                bloc: imageBloc,
+                builder: (context, state) {
+                  return GestureDetector(
+                    onTap: () => showImageSourceSheet(context, imageBloc, "profile"),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
+                      child: Container(
+                        height: 250.h,
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: state is ImageNotSelectState ? AppColors.red : Colors.grey),
+                          borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
+                        ),
+                        child: imageBloc.resizedImagePath.isNotEmpty
+                          ? Image.file(
+                              File(imageBloc.resizedImagePath), 
+                              fit: BoxFit.cover,
+                            )
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.camera_alt, size: 50.sp, color: state is ImageNotSelectState ? AppColors.red : Colors.grey),
+                              SizedBox(height: AppSizes.bodyPadding),
+                              Text("Profile Photo", style: myText(color: state is ImageNotSelectState ? AppColors.red : Colors.grey)),
+                            ],
+                          ),
+                      ),
+                    ),
+                  );
+                },
+              ),
           
-              // SizedBox(
-              //   height: AppSizes.bodyPadding * 2,
-              // ),
+              SizedBox(
+                height: AppSizes.bodyPadding * 2,
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -311,13 +313,13 @@ class _SetupProfileState extends State<SetupProfile> {
                   ),
                 ],
               ),
-              SizedBox(height: AppSizes.bodyPadding * 10),
+              SizedBox(height: AppSizes.bodyPadding * 2),
               // Save Button
               AppButton(
                 press: () {
                   if(formKey.currentState!.validate()){
                     imageBloc.add(ValidateImageEvent());
-                    // if(imageBloc.resizedImagePath.isNotEmpty){
+                    if(imageBloc.resizedImagePath.isNotEmpty){
                       // logger.d("hello : ${imageBloc.resizedImagePath}");
                       context.read<SetupProfileBloc>().add(
                         CreateSetupProfileEvent(
@@ -326,12 +328,12 @@ class _SetupProfileState extends State<SetupProfile> {
                           bloodGroup: setupProfileBloc.bloodGroup, 
                           dateOfBirth: convertDateTime(dobNotifier.value, 'yyyy-MM-dd'), 
                           gender: setupProfileBloc.gender, 
-                          // image: imageBloc.resizedImagePath, 
+                          image: imageBloc.resizedImagePath, 
                           height: feetInchesToCm(foot: setupProfileBloc.feet, inch: setupProfileBloc.inch), 
                           weight: setupProfileBloc.weight,
                         )
                       );
-                    // }
+                    }
                   }
                 },
                 text: "Save Profile",

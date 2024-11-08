@@ -42,6 +42,7 @@ class _SignUpState extends State<SignUp> {
           appLoadingDialog(context);
         } else if(state is AuthErrorState){
           AppRoutes.pop(context);
+          AppRoutes.pop(context);
           appErrorDialog(context, state.errorMessage);
         } else if(state is AuthSuccessState){
           AppRoutes.pop(context);
