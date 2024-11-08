@@ -111,8 +111,8 @@ class DashboardMeasurements {
 }
 
 class DashboardPressure {
-    final double? lowPressure;
-    final double? highPressure;
+    final int? lowPressure;
+    final int? highPressure;
     final DateTime? data;
 
     DashboardPressure({

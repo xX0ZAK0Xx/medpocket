@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' as mt;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:medpocket/blocs/dashboard/dashboard_bloc.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/widgets/app_text_style.dart';
@@ -17,6 +18,7 @@ class YourHealth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<DashboardBloc>().add(GetDashboardEvent());
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
       decoration: BoxDecoration(
@@ -26,27 +28,57 @@ class YourHealth extends StatelessWidget {
           AppColors.redShadow()
         ]
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Your health", style: myText(fontWeight: FontWeight.w500, color: AppColors.primary),),
-          SizedBox(height: AppSizes.bodyPadding),
-          Row(
-            children: [
-              const HeightWeightBox(title: "Height", value: "5ft 10in"),
-              SizedBox(width: AppSizes.bodyPadding),
-              const HeightWeightBox(title: "Weight", value: "65 kg"),
-            ],
-          ),
-          SizedBox(height: AppSizes.bodyPadding * 2),
-          Row(
-            children: [
-              BloodLevels(value: "125/75", title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1)),
-              SizedBox(width: AppSizes.bodyPadding),
-              BloodLevels(value: "5.5", title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2)),
-            ],
-          )
-        ],
+      child: BlocBuilder<DashboardBloc, DashboardState>(
+        buildWhen: (previous, current) => current is GetDashboardSuccessState,
+        builder: (context, state) {
+          if(state is GetDashboardSuccessState){
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Your health", style: myText(fontWeight: FontWeight.w500, color: AppColors.primary),),
+                SizedBox(height: AppSizes.bodyPadding),
+                Row(
+                  children: [
+                    HeightWeightBox(title: "Height", feet: cmToFeetInches(state.dashboardData.measurements?.height??0).foot, inch: cmToFeetInches(state.dashboardData.measurements?.height??0).inch,),
+                    SizedBox(width: AppSizes.bodyPadding),
+                    HeightWeightBox(title: "Weight", kg: state.dashboardData.measurements?.weight,),
+                  ],
+                ),
+                SizedBox(height: AppSizes.bodyPadding * 2),
+                Row(
+                  children: [
+                    BloodLevels(value: "${state.dashboardData.pressure?.highPressure}/${state.dashboardData.pressure?.lowPressure}", title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1)),
+                    SizedBox(width: AppSizes.bodyPadding),
+                    BloodLevels(value: "${state.dashboardData.glucose?.glucose}", title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2)),
+                  ],
+                )
+              ],
+            );
+          }else{
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Your health", style: myText(fontWeight: FontWeight.w500, color: AppColors.primary),),
+                SizedBox(height: AppSizes.bodyPadding),
+                Row(
+                  children: [
+                    HeightWeightBox(title: "Height", feet: context.read<DashboardBloc>().feet, inch: context.read<DashboardBloc>().inch,),
+                    SizedBox(width: AppSizes.bodyPadding),
+                    HeightWeightBox(title: "Weight", kg: context.read<DashboardBloc>().weight,),
+                  ],
+                ),
+                SizedBox(height: AppSizes.bodyPadding * 2),
+                Row(
+                  children: [
+                    BloodLevels(value: "${context.read<DashboardBloc>().highPressure}/${context.read<DashboardBloc>().lowPressure}", title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1)),
+                    SizedBox(width: AppSizes.bodyPadding),
+                    BloodLevels(value: "${context.read<DashboardBloc>().glucose}", title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2)),
+                  ],
+                )
+              ],
+            );
+          }
+        },
       ),
     );
   }
@@ -86,13 +118,12 @@ class BloodLevels extends StatelessWidget {
 }
 
 class HeightWeightBox extends StatelessWidget {
-  const HeightWeightBox({super.key, required this.value, required this.title});
-  final String value, title;
+  const HeightWeightBox({super.key, this.kg, required this.title,  this.feet, this.inch});
+  final String title;
+  final int? feet, inch, kg;
 
   @override
   Widget build(BuildContext context) {
-    final regExp = RegExp(r'(\d+\.?\d*)\s*([a-zA-Z]+)?');
-    final matches = regExp.allMatches(value);
 
     return Expanded(
       child: GestureDetector(
@@ -189,35 +220,68 @@ class HeightWeightBox extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              if(feet != null)
               RichText(
                 text: TextSpan(
-                  children: matches.map((match) {
-                    final numericPart = match.group(1) ?? '';
-                    final unitPart = match.group(2) ?? '';
-        
-                    return [
-                      TextSpan(
-                        text: numericPart,
-                        style: myText(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
+                  children: [
+                    TextSpan(
+                      text: '$feet',
+                      style: myText(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
-                      TextSpan(
-                        text: '$unitPart ',
-                        style: myText(
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primary.withOpacity(0.5),
-                        ),
+                    ),
+                    TextSpan(
+                      text: 'ft ',
+                      style: myText(
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary.withOpacity(0.5),
                       ),
-                    ];
-                  }).expand((span) => span).toList(),
+                    ),
+                    TextSpan(
+                      text: '$inch',
+                      style: myText(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'in',
+                      style: myText(
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary.withOpacity(0.5),
+                      ),
+                    ),
+                  ]
+                ),
+              )
+              else
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$kg',
+                      style: myText(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'kg',
+                      style: myText(
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary.withOpacity(0.5),
+                      ),
+                    ),
+                  ]
                 ),
               ),
               Text(
                 title,
-                style: myText(fontSize: 18.sp, color: AppColors.primary, fontWeight: FontWeight.w500),
+                style: myText(fontSize: 16.sp, color: AppColors.primary, fontWeight: FontWeight.w400),
               ),
             ],
           ),

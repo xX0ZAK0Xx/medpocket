@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medpocket/blocs/dashboard/dashboard_bloc.dart';
 import 'package:medpocket/configs/app_constants.dart';
 import 'blocs/bloc.dart';
 import 'configs/theme.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context)=>AuthBloc()),
         BlocProvider(create: (context)=>ShowBmiBloc()),
         BlocProvider(create: (context)=>SetupProfileBloc()),
+        BlocProvider(create: (context)=>DashboardBloc()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(392.72, 850.9),

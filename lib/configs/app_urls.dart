@@ -17,4 +17,7 @@ class AppUrls {
   //!Profile
   static String profile({required String id}) => "$baseUrl/api/user/profile${"/$id"}";
   static String profileSetup({required String id}) => "$baseUrl/api/user/profile-setup${"/$id"}";
+
+  //!Dashboard
+  static String dashboard({required String id}) => "$baseUrl/api/home/dashboard${"/$id"}";
 }
