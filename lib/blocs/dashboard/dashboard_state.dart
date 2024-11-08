@@ -29,3 +29,12 @@ final class UpdateHeightWeightFailedState extends DashboardState {
 
   UpdateHeightWeightFailedState({required this.errorMessage});
 }
+
+//?Update BloodPressure
+final class UpdateBloodPressureLoadingState extends DashboardState {}
+final class UpdateBloodPressureSuccessState extends DashboardState {}
+final class UpdateBloodPressureFailedState extends DashboardState {
+  final String errorMessage;
+
+  UpdateBloodPressureFailedState({required this.errorMessage});
+}

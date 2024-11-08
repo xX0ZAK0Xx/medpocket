@@ -11,6 +11,7 @@ class AppSnackbar {
     backgroundColor: Colors.transparent,
     elevation: 0,
     behavior: SnackBarBehavior.floating,
+    duration: Duration(milliseconds: 800),
   );
   static SnackBar failedSnackbar ({required String title, required String message}) =>  SnackBar(
     content: AwesomeSnackbarContent(
