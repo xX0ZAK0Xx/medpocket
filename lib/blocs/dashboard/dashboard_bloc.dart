@@ -20,6 +20,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<GetDashboardEvent>(getDashboardEvent);
     on<UpdateHeightWeightEvent>(updateHeightWeightEvent);
     on<UpdateBloodPressureEvent>(updateBloodPressureEvent);
+    on<UpdateGlucoseEvent>(updateGlucoseEvent);
   }
 
   FutureOr<void> getDashboardEvent(GetDashboardEvent event, Emitter<DashboardState> emit) async {
@@ -110,6 +111,27 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       }
     } catch (e) {
       emit(UpdateBloodPressureFailedState(errorMessage: e.toString()));
+      logger.e(e.toString());
+    }
+  }
+
+  FutureOr<void> updateGlucoseEvent(UpdateGlucoseEvent event, Emitter<DashboardState> emit) async {
+    emit(UpdateGlucoseLoadingState());
+    try {
+      final payload = {
+        "glucose" : event.glucose.toString(),
+      };
+      logger.d("payload: $payload");
+      final res = await postResponse(url: AppUrls.glucose(id: await LocalDB.getId()??""), payload: payload);
+      final ResponseModel responseModel = responseModelFromJson(res);
+      if(responseModel.success == true) {
+        emit(UpdateGlucoseSuccessState());
+      }else{
+        emit(UpdateGlucoseFailedState(errorMessage: responseModel.message??"Failed to update blood pressure"));
+        logger.e(responseModel.message??"Failed to update blood pressure");
+      }
+    } catch (e) {
+      emit(UpdateGlucoseFailedState(errorMessage: e.toString()));
       logger.e(e.toString());
     }
   }

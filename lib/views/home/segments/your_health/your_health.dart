@@ -29,7 +29,7 @@ class YourHealth extends StatelessWidget {
         ]
       ),
       child: BlocConsumer<DashboardBloc, DashboardState>(
-        listenWhen: (previous, current) => current is UpdateHeightWeightFailedState || current is UpdateHeightWeightSuccessState || current is UpdateBloodPressureSuccessState || current is UpdateBloodPressureFailedState,
+        listenWhen: (previous, current) => current is UpdateHeightWeightFailedState || current is UpdateHeightWeightSuccessState || current is UpdateBloodPressureSuccessState || current is UpdateBloodPressureFailedState || current is UpdateGlucoseFailedState || current is UpdateGlucoseSuccessState,
         listener: (context, state) {
           // if (state is UpdateHeightWeightLoadingState) {
           //   ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.loadingSnackbar(title: "Updating", message: "Updating height and weight..."));
@@ -44,6 +44,12 @@ class YourHealth extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateBloodPressureSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Blood pressure updated successfully!"));
+
+            context.read<DashboardBloc>().add(GetDashboardEvent());
+          } else if (state is UpdateGlucoseFailedState) {
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
+          } else if (state is UpdateGlucoseSuccessState) {
+            ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Glucose Level updated successfully!"));
 
             context.read<DashboardBloc>().add(GetDashboardEvent());
           }

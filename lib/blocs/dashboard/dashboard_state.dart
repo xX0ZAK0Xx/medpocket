@@ -38,3 +38,12 @@ final class UpdateBloodPressureFailedState extends DashboardState {
 
   UpdateBloodPressureFailedState({required this.errorMessage});
 }
+
+//?Update glucose
+final class UpdateGlucoseLoadingState extends DashboardState {}
+final class UpdateGlucoseSuccessState extends DashboardState {}
+final class UpdateGlucoseFailedState extends DashboardState {
+  final String errorMessage;
+
+  UpdateGlucoseFailedState({required this.errorMessage});
+}

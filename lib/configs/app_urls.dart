@@ -22,4 +22,5 @@ class AppUrls {
   static String dashboard({required String id}) => "$baseUrl/api/home/dashboard${"/$id"}";
   static String measurements({required String id}) => "$baseUrl/api/health/add-measurement${"/$id"}";
   static String pressure({required String id}) => "$baseUrl/api/health/add-pressure/$id";
+  static String glucose({required String id}) => "$baseUrl/api/health/add-glucose/$id";
 }

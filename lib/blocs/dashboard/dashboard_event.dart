@@ -15,3 +15,9 @@ class UpdateBloodPressureEvent extends DashboardEvent {
 
   UpdateBloodPressureEvent({required this.high, required this.low});
 }
+//?Glucose Update Event
+class UpdateGlucoseEvent extends DashboardEvent {
+  final double glucose;
+
+  UpdateGlucoseEvent({required this.glucose});
+}

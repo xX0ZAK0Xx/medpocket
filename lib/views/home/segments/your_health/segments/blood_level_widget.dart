@@ -48,6 +48,7 @@ class _BloodLevelsState extends State<BloodLevels> {
           content: Column(
             children: [
               SizedBox(height: AppSizes.bodyPadding,),
+              if(widget.glucose == null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -98,7 +99,63 @@ class _BloodLevelsState extends State<BloodLevels> {
                     ),
                   ),
                 ],
-              ),
+              )
+              else
+              Column(
+                children: [
+                  Text("Glucose (mmol/L)",style: myText(fontWeight: FontWeight.w500, color: AppColors.secondary)),
+                  ValueListenableBuilder<double>(
+                    valueListenable: glucose,
+                    builder: (context, value, child) {
+                      // Split the integer and decimal parts
+                      final parts = value.toStringAsFixed(1).split('.');
+                      final integerPart = parts[0];
+                      final decimalPart = parts[1];
+
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DecimalNumberPicker(
+                            value: value == 0 ? 6 : value,
+                            axis: Axis.horizontal,
+                            itemCount: 5,
+                            decimalPlaces: 1,
+                            itemWidth: 70.w,
+                            minValue: 0,
+                            maxValue: 30,
+                            selectedTextStyle: myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 20.sp),
+                            onChanged: (newValue) => glucose.value = newValue,
+                          ),
+                          SizedBox(height: 8), // Spacer for readability
+                          RichText(
+                            text: TextSpan(
+                              style: myText(fontSize: 20.sp),
+                              children: [
+                                TextSpan(
+                                  text: integerPart,
+                                  style:myText(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 24.sp)
+                                ),
+                                TextSpan(
+                                  text: '.',
+                                  style:myText(color: AppColors.textColorb3, fontWeight: FontWeight.w600, fontSize: 24.sp)
+                                ),
+                                TextSpan(
+                                  text: decimalPart,
+                                  style:myText(color: AppColors.blue, fontWeight: FontWeight.w500, fontSize: 24.sp)
+                                ),
+                                TextSpan(
+                                  text: ' mmol/L',
+                                  style: myText()
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                ],
+              )
             ],
           ),
           actions: [
@@ -106,7 +163,11 @@ class _BloodLevelsState extends State<BloodLevels> {
               child: Text('Save', style: myText(fontWeight: FontWeight.bold, color: AppColors.secondary, fontSize: 18.sp).copyWith(fontFamily: "Poppins"),),
               onPressed: () {
                 Navigator.pop(context);
-                context.read<DashboardBloc>().add(UpdateBloodPressureEvent(high: highPressure.value, low: lowPressure.value));
+                if(widget.glucose != null){
+                  context.read<DashboardBloc>().add(UpdateGlucoseEvent(glucose: glucose.value== 0 ? 6.0 : glucose.value));
+                }else{
+                  context.read<DashboardBloc>().add(UpdateBloodPressureEvent(high: highPressure.value == 0 ? 120 : highPressure.value, low: lowPressure.value == 0 ? 80 : lowPressure.value));
+                }
               },
             ),
           ],
