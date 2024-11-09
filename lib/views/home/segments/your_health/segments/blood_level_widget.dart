@@ -40,7 +40,9 @@ class _BloodLevelsState extends State<BloodLevels> {
   @override
   void initState() {
     super.initState();
-    
+    highPressure.value = widget.highPressure?? 0;
+    lowPressure.value = widget.lowPressure?? 0;
+    glucose.value = widget.glucose?? 0;
     if (widget.lastChecked != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProgress();  // Set initial progress after the first frame

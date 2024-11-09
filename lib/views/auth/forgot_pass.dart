@@ -117,7 +117,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
-                                                GestureDetector(
+                                                InkWell(
                                                   onTap: () => AppRoutes.pop(context),
                                                   child: Text("Back to sign in", style: myText(fontWeight: FontWeight.w500, color: AppColors.textColorw2, fontSize: 12.sp),),
                                                 )

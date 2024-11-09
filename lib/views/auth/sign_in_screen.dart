@@ -140,7 +140,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               fillColor: AppColors.bg.withOpacity(0.1),
                                               textColor: AppColors.textColorw1,
                                               isRequired: true,
-                                              suffixIcon: GestureDetector(
+                                              suffixIcon: InkWell(
                                                 onTap: () {
                                                   passwordBloc.add(TogglePasswordEvent());
                                                 },
