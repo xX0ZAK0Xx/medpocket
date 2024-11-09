@@ -78,7 +78,7 @@ class YourHealth extends StatelessWidget {
                 Row(
                   children: [
                     BloodLevels(
-                      key: ValueKey(state.dashboardData.pressure?.data ?? state.dashboardData.pressure?.data),
+                      key: ValueKey("pressure${state.dashboardData.pressure?.data}"),
                       highPressure: state.dashboardData.pressure?.highPressure,
                       lowPressure:  state.dashboardData.pressure?.lowPressure, 
                       title: "Pressure", 
@@ -90,7 +90,7 @@ class YourHealth extends StatelessWidget {
                     SizedBox(width: AppSizes.bodyPadding),
                     // BloodLevels(glucose: state.dashboardData.gluco,se?.glucose, title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2), isPressure: false,lastChecked: state.dashboardData.glucose?.date,)
                     BloodLevels(
-                      key: ValueKey(state.dashboardData.glucose?.date ?? state.dashboardData.glucose?.date),
+                      key: ValueKey("glucose${state.dashboardData.glucose?.date}"),
                       glucose: state.dashboardData.glucose?.glucose,
                       title: "Glucose",
                       icon: HugeIcons.strokeRoundedBlood,
