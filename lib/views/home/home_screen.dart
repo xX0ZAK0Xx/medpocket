@@ -3,6 +3,7 @@ import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/views/home/segments/header/home_header.dart';
 import 'package:medpocket/views/home/segments/your_health/your_health.dart';
 
+import '../views.dart';
 import 'segments/bmi/bmi_graph.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -22,7 +23,9 @@ class HomeScreen extends StatelessWidget {
               Expanded(child: ListView(
                 children: [
                   const YourHealth(),
-                  SizedBox(height: AppSizes.bodyPadding * 2),
+                  SizedBox(height: AppSizes.bodyPadding),
+                  PressureGlucoseGraph(),
+                  SizedBox(height: AppSizes.bodyPadding),
                   const BmiGraph(),
                 ],
               ))

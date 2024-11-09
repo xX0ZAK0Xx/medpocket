@@ -15,6 +15,10 @@ part 'dashboard_state.dart';
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   int feet = 0, inch = 0, weight = 0, highPressure = 0, lowPressure = 0;
   double glucose = 0.0;
+  bool loadedPressure = false, loadedGlucose = false;
+  List<DayWisePressureData> pressureList = [];
+  List<DayWiseGlucoseData> glucoseList = [];
+
 
   DashboardBloc() : super(DashboardInitial()) {
     on<GetDashboardEvent>(getDashboardEvent);
@@ -141,11 +145,17 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   FutureOr<void> getDaywisePressureEvent(GetDaywisePressureEvent event, Emitter<DashboardState> emit)async {
-    emit(GetDaywisePressureLoadingState());
+    if(!loadedPressure) {
+      emit(GetDaywisePressureLoadingState());
+    }else{
+      emit(GetDaywisePressureSuccessState(dayWisePressureList: pressureList));
+    }
     try {
       final res = await getResponse(url: AppUrls.daywisePressure(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Pressure Data");
       final DayWisePressuresModel dayWisePressuresModel = dayWisePressuresModelFromJson(res);
       if(dayWisePressuresModel.success == true) {
+        loadedPressure = true;
+        pressureList = dayWisePressuresModel.data?? [];
         emit(GetDaywisePressureSuccessState(dayWisePressureList: dayWisePressuresModel.data?? []));
       }else{
         logger.e(dayWisePressuresModel.message??"Failed to get daywise pressure data");
@@ -158,11 +168,17 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   FutureOr<void> getDaywiseGlucoseEvent(GetDaywiseGlucoseEvent event, Emitter<DashboardState> emit)async {
-    emit(GetDaywiseGlucoseLoadingState());
+    if(!loadedGlucose) {
+      emit(GetDaywiseGlucoseLoadingState());
+    }else{
+      emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: glucoseList));
+    }
     try {
       final res = await getResponse(url: AppUrls.daywiseGlucose(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Glucose Data");
       final DayWiseGlucoseModel dayWiseGlucoseModel = dayWiseGlucoseModelFromJson(res);
       if(dayWiseGlucoseModel.success == true) {
+        loadedGlucose = true;
+        glucoseList = dayWiseGlucoseModel.data?? [];
         emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: dayWiseGlucoseModel.data?? []));
       }else{
         logger.e(dayWiseGlucoseModel.message??"Failed to get daywise Glucose data");

@@ -44,13 +44,13 @@ class YourHealth extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateBloodPressureSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Blood pressure updated successfully!"));
-
+            context.read<DashboardBloc>().add(GetDaywisePressureEvent(days: 1));
             context.read<DashboardBloc>().add(GetDashboardEvent());
           } else if (state is UpdateGlucoseFailedState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateGlucoseSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Glucose Level updated successfully!"));
-
+            context.read<DashboardBloc>().add(GetDaywiseGlucoseEvent(days: 1));
             context.read<DashboardBloc>().add(GetDashboardEvent());
           }
         },
@@ -74,7 +74,7 @@ class YourHealth extends StatelessWidget {
                     HeightWeightBox(title: "Weight", kg: state.dashboardData.measurements?.weight,),
                   ],
                 ),
-                SizedBox(height: AppSizes.bodyPadding * 2),
+                SizedBox(height: AppSizes.bodyPadding),
                 Row(
                   children: [
                     BloodLevels(
@@ -115,7 +115,7 @@ class YourHealth extends StatelessWidget {
                     HeightWeightBox(title: "Weight", kg: context.read<DashboardBloc>().weight,),
                   ],
                 ),
-                SizedBox(height: AppSizes.bodyPadding * 2),
+                SizedBox(height: AppSizes.bodyPadding),
                 Row(
                   children: [
                     BloodLevels(highPressure: context.read<DashboardBloc>().highPressure, lowPressure: context.read<DashboardBloc>().lowPressure, title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1), isPressure: true,),

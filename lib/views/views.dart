@@ -9,3 +9,4 @@ export 'auth/email_sent.dart';
 export 'auth/sign_up.dart';
 export 'root.dart';
 export './user_info_setup/setup_profile.dart';
+export './home/segments/pressure_glucose_graph/pressure_glucose_graph.dart';

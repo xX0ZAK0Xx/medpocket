@@ -82,7 +82,7 @@ class BmiGraph extends StatelessWidget {
           
           // Make the graph scrollable horizontally
           SizedBox(
-            height: 250.h,
+            height: 200.h,
             child: SizedBox(
               // width: bmiEntries.length * 100.w, // Adjust width based on the data length
               child: _LineChart(
