@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/widgets/app_snackbar.dart';
@@ -55,7 +54,7 @@ class YourHealth extends StatelessWidget {
             context.read<DashboardBloc>().add(GetDashboardEvent());
           }
         },
-        buildWhen: (previous, current) => current is GetDashboardSuccessState || current is GetDashboardLoadingState || current is GetDashboardFailedState,
+        buildWhen: (previous, current) => current is GetDashboardSuccessState,
         builder: (context, state) {
           if(state is GetDashboardSuccessState){
             final Height height = cmToFeetInches(state.dashboardData.measurements?.height??0);
