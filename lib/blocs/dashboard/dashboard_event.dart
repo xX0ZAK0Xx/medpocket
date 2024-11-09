@@ -21,3 +21,16 @@ class UpdateGlucoseEvent extends DashboardEvent {
 
   UpdateGlucoseEvent({required this.glucose});
 }
+
+//?Get Daywise glucose event
+class GetDaywiseGlucoseEvent extends DashboardEvent {
+  final int days;
+
+  GetDaywiseGlucoseEvent({required this.days});
+}
+//?get Daywise pressure event
+class GetDaywisePressureEvent extends DashboardEvent {
+  final int days;
+
+  GetDaywisePressureEvent({required this.days});
+}
