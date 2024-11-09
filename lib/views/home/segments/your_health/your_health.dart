@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/widgets/app_snackbar.dart';
@@ -54,10 +55,10 @@ class YourHealth extends StatelessWidget {
             context.read<DashboardBloc>().add(GetDashboardEvent());
           }
         },
-        buildWhen: (previous, current) => current is GetDashboardSuccessState,
+        buildWhen: (previous, current) => current is GetDashboardSuccessState || current is GetDashboardLoadingState || current is GetDashboardFailedState,
         builder: (context, state) {
           if(state is GetDashboardSuccessState){
-          final Height height = cmToFeetInches(state.dashboardData.measurements?.height??0);
+            final Height height = cmToFeetInches(state.dashboardData.measurements?.height??0);
             context.read<SetupProfileBloc>().feet = height.foot;
             // context.read<SetupProfileBloc>().feet = 15;
             context.read<SetupProfileBloc>().inch = height.inch;
@@ -77,9 +78,27 @@ class YourHealth extends StatelessWidget {
                 SizedBox(height: AppSizes.bodyPadding * 2),
                 Row(
                   children: [
-                    BloodLevels(highPressure: state.dashboardData.pressure?.highPressure,lowPressure:  state.dashboardData.pressure?.lowPressure, title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1), isPressure: true,),
+                    BloodLevels(
+                      key: ValueKey(state.dashboardData.pressure?.data ?? state.dashboardData.pressure?.data),
+                      highPressure: state.dashboardData.pressure?.highPressure,
+                      lowPressure:  state.dashboardData.pressure?.lowPressure, 
+                      title: "Pressure", 
+                      icon: HugeIcons.strokeRoundedBloodPressure, 
+                      color: AppColors.primary.withOpacity(0.1), 
+                      isPressure: true,
+                      lastChecked: state.dashboardData.pressure?.data,
+                    ),
                     SizedBox(width: AppSizes.bodyPadding),
-                    BloodLevels(glucose: state.dashboardData.glucose?.glucose, title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2), isPressure: false,),
+                    // BloodLevels(glucose: state.dashboardData.gluco,se?.glucose, title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2), isPressure: false,lastChecked: state.dashboardData.glucose?.date,)
+                    BloodLevels(
+                      key: ValueKey(state.dashboardData.glucose?.date ?? state.dashboardData.glucose?.date),
+                      glucose: state.dashboardData.glucose?.glucose,
+                      title: "Glucose",
+                      icon: HugeIcons.strokeRoundedBlood,
+                      color: AppColors.secondary.withOpacity(0.2),
+                      isPressure: false,
+                      lastChecked: state.dashboardData.glucose?.date,
+                    ),
                   ],
                 )
               ],
@@ -102,7 +121,7 @@ class YourHealth extends StatelessWidget {
                   children: [
                     BloodLevels(highPressure: context.read<DashboardBloc>().highPressure, lowPressure: context.read<DashboardBloc>().lowPressure, title: "Pressure", icon: HugeIcons.strokeRoundedBloodPressure, color: AppColors.primary.withOpacity(0.1), isPressure: true,),
                     SizedBox(width: AppSizes.bodyPadding),
-                    BloodLevels(glucose: context.read<DashboardBloc>().glucose, title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2), isPressure: false,),
+                    BloodLevels(glucose: context.read<DashboardBloc>().glucose, title: "Glucose", icon: HugeIcons.strokeRoundedBlood, color: AppColors.secondary.withOpacity(0.2), isPressure: false),
                   ],
                 )
               ],
