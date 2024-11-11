@@ -119,9 +119,11 @@ class _PressureGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int maxY = pressureData
-        .map((entry) => max(entry.highPressure ?? 0, entry.lowPressure ?? 0))
-        .reduce(max);
+    int maxY = pressureData.isNotEmpty
+        ? pressureData
+            .map((entry) => max(entry.highPressure ?? 0, entry.lowPressure ?? 0))
+            .reduce(max)
+        : 0;
 
     return LineChart(
       LineChartData(
@@ -134,7 +136,7 @@ class _PressureGraph extends StatelessWidget {
           _lowPressureLineData,
         ],
         minX: 0,
-        maxX: (pressureData.length - 1).toDouble(),
+        maxX: (pressureData.isNotEmpty ? pressureData.length - 1 : 0).toDouble(),
         maxY: maxY + 10, // Add padding to the top
         minY: 0,
       ),
@@ -227,9 +229,11 @@ class _GlucoseGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double maxY = glucoseData
-        .map((entry) => entry.glucose ?? 0)
-        .reduce(max);
+    double maxY = glucoseData.isNotEmpty 
+        ? glucoseData
+          .map((entry) => entry.glucose ?? 0)
+          .reduce(max)
+        : 0;
 
     return LineChart(
       LineChartData(
@@ -241,7 +245,7 @@ class _GlucoseGraph extends StatelessWidget {
           _glucoseLineData,
         ],
         minX: 0,
-        maxX: (glucoseData.length - 1).toDouble(),
+        maxX: (glucoseData.isNotEmpty ? glucoseData.length - 1 : 0).toDouble(),
         maxY: maxY + 10, // Add padding to the top
         minY: 0,
       ),
