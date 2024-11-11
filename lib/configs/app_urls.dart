@@ -26,4 +26,6 @@ class AppUrls {
 
   static String pressure({required String id}) => "$baseUrl/api/health/add-pressure/$id";
   static String daywisePressure({required String id, required int days}) => "$baseUrl/api/health/pressure-by-days/$id?days=$days";
+
+  static String daywiseMeasurements({required String id, required int days}) => "$baseUrl/api/health/measurements-by-days/$id?days=$days";
 }

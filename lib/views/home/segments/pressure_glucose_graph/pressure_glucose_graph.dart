@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medpocket/blocs/bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../../configs/app_constants.dart';
 import '../../../../configs/app_sizes.dart';
 import '../../../../configs/colors.dart';
 import '../../../../models/model.dart';
@@ -37,7 +36,6 @@ class PressureGlucoseGraph extends StatelessWidget {
               buildWhen: (previous, current) => current is GetDashboardSuccessState,
               builder: (context, state) {
                 if (state is GetDashboardSuccessState) {
-                  logger.i("pressureData: ${state.dashboardData.pressure?.todayPressure?? []}");
                   return Column(
                     children: [
                       SizedBox(
@@ -121,7 +119,6 @@ class _PressureGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.f("Pressure: $pressureData");
     int maxY = pressureData.isNotEmpty
         ? pressureData
             .map((entry) => max(entry.highPressure ?? 0, entry.lowPressure ?? 0))

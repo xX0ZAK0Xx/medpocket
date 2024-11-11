@@ -4,3 +4,4 @@ export 'profile/profile_model.dart';
 export './common/meta_model.dart';
 export './common/height_model.dart';
 export './dashboard/dashboard_model.dart';
+export './measurements/measurements_model.dart';

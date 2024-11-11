@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:medpocket/blocs/bloc/measurements_bloc.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/widgets/app_snackbar.dart';
@@ -12,13 +13,21 @@ import '../../../../utils/utils.dart';
 import 'segments/blood_level_widget.dart';
 import 'segments/height_weight_widget.dart';
 
-class YourHealth extends StatelessWidget {
+class YourHealth extends StatefulWidget {
   const YourHealth({super.key});
 
+  @override
+  State<YourHealth> createState() => _YourHealthState();
+}
 
+class _YourHealthState extends State<YourHealth> {
+  @override
+  void initState() {
+    context.read<DashboardBloc>().add(GetDashboardEvent());
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    context.read<DashboardBloc>().add(GetDashboardEvent());
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
       decoration: BoxDecoration(
@@ -38,8 +47,8 @@ class YourHealth extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateHeightWeightSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Height and weight updated successfully!"));
-            
             context.read<DashboardBloc>().add(GetDashboardEvent());
+            context.read<MeasurementsBloc>().add(GetMeasurementsEvent());
           } else if (state is UpdateBloodPressureFailedState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateBloodPressureSuccessState) {

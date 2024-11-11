@@ -3,26 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medpocket/blocs/show_bmi/show_bmi_bloc.dart';
-import 'package:medpocket/utils/app_convert_datetime.dart';
+import 'package:medpocket/blocs/bloc/measurements_bloc.dart';
+import 'package:medpocket/utils/utils.dart';
 
 import '../../../../configs/app_sizes.dart';
 import '../../../../configs/colors.dart';
+import '../../../../models/model.dart';
 import '../../../../widgets/widgets.dart';
 import 'dart:math';
 
-import 'bmi_class.dart';
-
-class BmiGraph extends StatelessWidget {
+class BmiGraph extends StatefulWidget {
 
   const BmiGraph({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 0));
-    // Calculate maxY based on the maximum height or weight value
-    double maxY = bmiEntries.map((entry) => max(entry.height, entry.weight)).reduce(max);
+  State<BmiGraph> createState() => _BmiGraphState();
+}
 
+class _BmiGraphState extends State<BmiGraph> {
+  late MeasurementsBloc measurementsBloc;
+  @override
+  void initState() {
+    measurementsBloc = BlocProvider.of<MeasurementsBloc>(context);
+    measurementsBloc.add(GetMeasurementsEvent());
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
       decoration: BoxDecoration(
@@ -40,39 +47,45 @@ class BmiGraph extends StatelessWidget {
                 "BMI",
                 style: myText(fontWeight: FontWeight.w500, color: AppColors.primary),
               ),
-              BlocBuilder<ShowBmiBloc, ShowBmiState>(
+              BlocBuilder<MeasurementsBloc, MeasurementsState>(
+                buildWhen: (previous, current) => current is ChangeDaysState,
                 builder: (context, state) {
-                  if(state is ToggleDateRangeState){
-                    return Row(
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 0));
-                          },
-                          child: Text("7D", style: myText(fontWeight: FontWeight.bold, color: state.index == 0 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
-                        ),
-                        SizedBox(width: AppSizes.bodyPadding * 2,),
-                        GestureDetector(
-                          onTap: (){
-                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 1));
-                          },
-                          child: Text("15D", style: myText(fontWeight: FontWeight.bold, color: state.index == 1 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
-                        ),
-                        SizedBox(width: AppSizes.bodyPadding * 2,),
-                        GestureDetector(
-                          onTap: (){
-                            context.read<ShowBmiBloc>().add(ToggleDateRangeEvent(index: 2));
-                          },
-                          child: Text("1M", style: myText(fontWeight: FontWeight.bold, color: state.index == 2 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
-                        ),
-                        SizedBox(width: AppSizes.bodyPadding,)
-                      ],
-                    );
-                  }else{
-                    return const SizedBox.shrink();
-                  }
+                  return Row(
+                    children: [
+                      GestureDetector(
+                        onTap: (){
+                          if(measurementsBloc.days != 7){
+                            measurementsBloc.add(ChangDaysEvent(days: 7));
+                            measurementsBloc.add(GetMeasurementsEvent());
+                          }
+                        },
+                        child: Text("7D", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 7 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                      ),
+                      SizedBox(width: AppSizes.bodyPadding * 2,),
+                      GestureDetector(
+                        onTap: (){
+                          if(measurementsBloc.days != 15){
+                            measurementsBloc.add(ChangDaysEvent(days: 15));
+                            measurementsBloc.add(GetMeasurementsEvent());
+                          }
+                        },
+                        child: Text("15D", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 15 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                      ),
+                      SizedBox(width: AppSizes.bodyPadding * 2,),
+                      GestureDetector(
+                        onTap: (){
+                          if(measurementsBloc.days != 30){
+                            measurementsBloc.add(ChangDaysEvent(days: 30));
+                            measurementsBloc.add(GetMeasurementsEvent());
+                          }
+                        },
+                        child: Text("1M", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 30 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
+                      ),
+                      SizedBox(width: AppSizes.bodyPadding,)
+                    ],
+                  );
                 },
-              ),
+              )
             ],
           ),
           SizedBox(height: AppSizes.bodyPadding),
@@ -81,15 +94,38 @@ class BmiGraph extends StatelessWidget {
           SizedBox(height: AppSizes.bodyPadding * 2),
           
           // Make the graph scrollable horizontally
-          SizedBox(
-            height: 200.h,
-            child: SizedBox(
-              // width: bmiEntries.length * 100.w, // Adjust width based on the data length
-              child: _LineChart(
-                bmiEntries: bmiEntries,
-                maxY: maxY,
-              ),
-            ),
+          BlocBuilder<MeasurementsBloc, MeasurementsState>(
+            buildWhen: (previous, current) => current is GetMeasurementsSuccessState,
+            builder: (context, state) {
+              if(state is GetMeasurementsSuccessState){
+                double maxY = state.measurementsData.isNotEmpty
+                  ? state.measurementsData
+                        .map((entry) => max(entry.height ?? 0.0, entry.weight ?? 0.0))
+                        .reduce(max)
+                        .toDouble()
+                  : 0.0;
+
+                return SizedBox(
+                  height: 200.h,
+                  child: SizedBox(
+                    child: _LineChart(
+                      bmiEntries: state.measurementsData,
+                      maxY: maxY,
+                    ),
+                  ),
+                );
+              }else{
+                return SizedBox(
+                  height: 200.h,
+                  child: SizedBox(
+                    child: _LineChart(
+                      bmiEntries: [],
+                      maxY: 170,
+                    ),
+                  ),
+                );
+              }
+            },
           ),
 
           Row(
@@ -107,10 +143,9 @@ class BmiGraph extends StatelessWidget {
   }
 
   Widget _buildBmiStatistics() {
-    // Calculate BMI statistics (average, min, max)
-    double averageBmi = bmiEntries.map((entry) => entry.bmi).reduce((a, b) => a + b) / bmiEntries.length;
-    double minBmi = bmiEntries.map((entry) => entry.bmi).reduce(min);
-    double maxBmi = bmiEntries.map((entry) => entry.bmi).reduce(max);
+    double averageBmi = 21.5;
+    double minBmi = 21;
+    double maxBmi = 22;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -189,7 +224,7 @@ class BmiValues extends StatelessWidget {
 }
 
 class _LineChart extends StatelessWidget {
-  final List<BmiEntry> bmiEntries;
+  final List<MeasurementsData> bmiEntries;
   final double maxY;
 
   const _LineChart({
@@ -232,18 +267,19 @@ class _LineChart extends StatelessWidget {
             return touchedSpots.map((touchedSpot) {
               final index = touchedSpot.spotIndex;
               final entry = bmiEntries[index];
+              final Height height = cmToFeetInches(entry.height?.toDouble()??0);
               String tooltipText;
 
               // Determine which line was touched by checking the barIndex
               switch (touchedSpot.barIndex) {
                 case 0: // Height line
-                  tooltipText = '${convertDateTime(entry.date, 'dd MMM, yyyy')}\n\nHeight: ${_convertInchesToFeetInches(entry.height)}';
+                  tooltipText = '${convertDateTime(entry.date, 'dd MMM, yyyy')}\n\n${height.foot}ft ${height.inch}in';
                   break;
                 case 1: // Weight line
-                  tooltipText = 'Weight: ${entry.weight.toStringAsFixed(1)} kg';
+                  tooltipText = 'Weight: ${entry.weight?.toStringAsFixed(1)} kg';
                   break;
                 case 2: // BMI line
-                  tooltipText = 'BMI: ${entry.bmi.toStringAsFixed(2)}';
+                  tooltipText = 'BMI: ${entry.bmi?.toStringAsFixed(2)}';
                   break;
                 default:
                   tooltipText = '';
@@ -286,7 +322,7 @@ class _LineChart extends StatelessWidget {
         isStrokeCapRound: true,
         dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
-          return FlSpot(index.toDouble(), bmiEntries[index].height);
+         return FlSpot(index.toDouble(), (bmiEntries[index].height ?? 0).toDouble());
         }),
       );
 
@@ -297,7 +333,7 @@ class _LineChart extends StatelessWidget {
         isStrokeCapRound: true,
         dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
-          return FlSpot(index.toDouble(), bmiEntries[index].weight);
+          return FlSpot(index.toDouble(), (bmiEntries[index].weight??0).toDouble());
         }),
       );
 
@@ -308,7 +344,7 @@ class _LineChart extends StatelessWidget {
         isStrokeCapRound: true,
         dotData: const FlDotData(show: true),
         spots: List.generate(bmiEntries.length, (index) {
-          return FlSpot(index.toDouble(), bmiEntries[index].bmi);
+          return FlSpot(index.toDouble(), (bmiEntries[index].bmi??0).toDouble());
         }),
       );
 
@@ -332,20 +368,13 @@ class _LineChart extends StatelessWidget {
         },
         interval: 1, // Change this to 1 to take 1 unit of space
       );
-}
 
-SideTitles leftTitles() => SideTitles(
-      showTitles: true,
-      reservedSize: 25.w,
-      getTitlesWidget: (value, meta) {
-        return Text(value.toStringAsFixed(0), style: myText(fontSize: 10));
-      },
-      interval: 10,
-    );
-
-String _convertInchesToFeetInches(double inches) {
-  int totalInches = inches.round();
-  int feet = totalInches ~/ 12;
-  int remainingInches = totalInches % 12;
-  return "${feet}ft ${remainingInches}in";
+  SideTitles leftTitles() => SideTitles(
+        showTitles: true,
+        reservedSize: 25.w,
+        getTitlesWidget: (value, meta) {
+          return Text(value.toStringAsFixed(0), style: myText(fontSize: 10));
+        },
+        interval: 50,
+      );
 }

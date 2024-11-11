@@ -8,12 +8,21 @@ import 'package:medpocket/configs/colors.dart';
 
 import '../../../../widgets/widgets.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<HomeHeader> createState() => _HomeHeaderState();
+}
+
+class _HomeHeaderState extends State<HomeHeader> {
+  @override
+  void initState() {
     context.read<SetupProfileBloc>().add(GetProfileEvent());
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
       decoration: BoxDecoration(
