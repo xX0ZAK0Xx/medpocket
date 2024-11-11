@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medpocket/blocs/bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../../../configs/app_constants.dart';
 import '../../../../configs/app_sizes.dart';
 import '../../../../configs/colors.dart';
 import '../../../../models/model.dart';
@@ -18,8 +19,8 @@ class PressureGlucoseGraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Fetching the day-wise data for glucose and pressure
-    context.read<DashboardBloc>().add(GetDaywiseGlucoseEvent(days: 1));
-    context.read<DashboardBloc>().add(GetDaywisePressureEvent(days: 1));
+    // context.read<DashboardBloc>().add(GetDaywiseGlucoseEvent(days: 1));
+    // context.read<DashboardBloc>().add(GetDaywisePressureEvent(days: 1));
 
     return Container(
       padding: EdgeInsets.all(AppSizes.bodyPadding),
@@ -33,14 +34,15 @@ class PressureGlucoseGraph extends StatelessWidget {
           // Pressure Graph
           Expanded(
             child: BlocBuilder<DashboardBloc, DashboardState>(
-              buildWhen: (previous, current) => current is GetDaywisePressureSuccessState,
+              buildWhen: (previous, current) => current is GetDashboardSuccessState,
               builder: (context, state) {
-                if (state is GetDaywisePressureSuccessState) {
+                if (state is GetDashboardSuccessState) {
+                  logger.i("pressureData: ${state.dashboardData.pressure?.todayPressure?? []}");
                   return Column(
                     children: [
                       SizedBox(
                         height: 80.h,
-                        child: _PressureGraph(pressureData: state.dayWisePressureList),
+                        child: _PressureGraph(pressureData: state.dashboardData.pressure?.todayPressure??[]),
                       ),
                       Text("Todays Pressure", style: myText(color: AppColors.primary, fontWeight: FontWeight.w500),)
                     ],
@@ -63,14 +65,14 @@ class PressureGlucoseGraph extends StatelessWidget {
           // Glucose Graph
           Expanded(
             child: BlocBuilder<DashboardBloc, DashboardState>(
-              buildWhen: (previous, current) => current is GetDaywiseGlucoseSuccessState,
+              buildWhen: (previous, current) => current is GetDashboardSuccessState,
               builder: (context, state) {
-                if (state is GetDaywiseGlucoseSuccessState) {
+                if (state is GetDashboardSuccessState) {
                   return Column(
                     children: [
                       SizedBox(
                         height: 80.h,
-                        child: _GlucoseGraph(glucoseData: state.dayWiseGlucoseList),
+                        child: _GlucoseGraph(glucoseData: state.dashboardData.glucose?.todayGlucose??[]),
                       ),
                       Text("Todays Glucose", style: myText(color: AppColors.primary, fontWeight: FontWeight.w500),)
                     ],
@@ -114,11 +116,12 @@ FlGridData  _gridData({required bool isPressure}) => FlGridData(
     },
 );
 class _PressureGraph extends StatelessWidget {
-  final List<DayWisePressureData> pressureData;
+  final List<TodayPressure> pressureData;
   const _PressureGraph({required this.pressureData});
 
   @override
   Widget build(BuildContext context) {
+    logger.f("Pressure: $pressureData");
     int maxY = pressureData.isNotEmpty
         ? pressureData
             .map((entry) => max(entry.highPressure ?? 0, entry.lowPressure ?? 0))
@@ -224,7 +227,7 @@ class _PressureGraph extends StatelessWidget {
 }
 
 class _GlucoseGraph extends StatelessWidget {
-  final List<DayWiseGlucoseData> glucoseData;
+  final List<TodayGlucose> glucoseData;
   const _GlucoseGraph({required this.glucoseData});
 
   @override

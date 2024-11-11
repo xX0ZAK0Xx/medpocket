@@ -48,28 +48,28 @@ final class UpdateGlucoseFailedState extends DashboardState {
   UpdateGlucoseFailedState({required this.errorMessage});
 }
 
-//?Get Daywise glucose event
-final class GetDaywiseGlucoseLoadingState extends DashboardState {}
-final class GetDaywiseGlucoseSuccessState extends DashboardState {
-  final List<DayWiseGlucoseData> dayWiseGlucoseList;
+// //?Get Daywise glucose event
+// final class GetDaywiseGlucoseLoadingState extends DashboardState {}
+// final class GetDaywiseGlucoseSuccessState extends DashboardState {
+//   final List<DayWiseGlucoseData> dayWiseGlucoseList;
 
-  GetDaywiseGlucoseSuccessState({required this.dayWiseGlucoseList});
-}
-final class GetDaywiseGlucoseFailedState extends DashboardState {
-  final String errorMessage;
+//   GetDaywiseGlucoseSuccessState({required this.dayWiseGlucoseList});
+// }
+// final class GetDaywiseGlucoseFailedState extends DashboardState {
+//   final String errorMessage;
 
-  GetDaywiseGlucoseFailedState({required this.errorMessage});
-}
+//   GetDaywiseGlucoseFailedState({required this.errorMessage});
+// }
 
-//?Get Daywise pressure event
-final class GetDaywisePressureLoadingState extends DashboardState {}
-final class GetDaywisePressureSuccessState extends DashboardState {
-  final List<DayWisePressureData> dayWisePressureList;
+// //?Get Daywise pressure event
+// final class GetDaywisePressureLoadingState extends DashboardState {}
+// final class GetDaywisePressureSuccessState extends DashboardState {
+//   final List<DayWisePressureData> dayWisePressureList;
 
-  GetDaywisePressureSuccessState({required this.dayWisePressureList});
-}
-final class GetDaywisePressureFailedState extends DashboardState {
-  final String errorMessage;
+//   GetDaywisePressureSuccessState({required this.dayWisePressureList});
+// }
+// final class GetDaywisePressureFailedState extends DashboardState {
+//   final String errorMessage;
 
-  GetDaywisePressureFailedState({required this.errorMessage});
-}
+//   GetDaywisePressureFailedState({required this.errorMessage});
+// }

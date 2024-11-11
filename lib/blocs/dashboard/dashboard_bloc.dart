@@ -16,9 +16,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   int feet = 0, inch = 0, weight = 0, highPressure = 0, lowPressure = 0;
   double glucose = 0.0;
   bool loadedPressure = false, loadedGlucose = false;
-  List<DayWisePressureData> pressureList = [];
-  List<DayWiseGlucoseData> glucoseList = [];
-
 
   DashboardBloc() : super(DashboardInitial()) {
     on<GetDashboardEvent>(getDashboardEvent);
@@ -26,9 +23,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<UpdateHeightWeightEvent>(updateHeightWeightEvent);
     on<UpdateBloodPressureEvent>(updateBloodPressureEvent);
     on<UpdateGlucoseEvent>(updateGlucoseEvent);
-
-    on<GetDaywiseGlucoseEvent>(getDaywiseGlucoseEvent);
-    on<GetDaywisePressureEvent>(getDaywisePressureEvent);
   }
 
   FutureOr<void> getDashboardEvent(GetDashboardEvent event, Emitter<DashboardState> emit) async {
@@ -60,14 +54,20 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         lowPressure = dashboardModel.data?.pressure?.lowPressure??0;
         glucose = dashboardModel.data?.glucose?.glucose??0;
         emit(GetDashboardSuccessState(dashboardData: DashboardData(
-          glucose: DashboardGlucose(glucose: glucose, date: dashboardModel.data?.glucose?.date?? DateTime.now()),
+          glucose: DashboardGlucose(
+            glucose: glucose, date: dashboardModel.data?.glucose?.date?? DateTime.now(),
+            todayGlucose: dashboardModel.data?.glucose?.todayGlucose,
+          ),
           measurements: DashboardMeasurements(
             height: feetInchesToCm(foot: feet, inch: inch),
             weight: weight,
             bmi: dashboardModel.data?.measurements?.bmi??0,
             date: dashboardModel.data?.measurements?.date?? DateTime.now(),
           ),
-          pressure: DashboardPressure(highPressure: highPressure, lowPressure: lowPressure, data: dashboardModel.data?.pressure?.data?? DateTime.now())
+          pressure: DashboardPressure(
+            todayPressure: dashboardModel.data?.pressure?.todayPressure,
+            highPressure: highPressure, lowPressure: lowPressure, data: dashboardModel.data?.pressure?.data?? DateTime.now()
+          ),
         )));
       }else{
         emit(GetDashboardFailedState(errorMessage: dashboardModel.message??"Failed to get dashboard data"));
@@ -144,49 +144,49 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     }
   }
 
-  FutureOr<void> getDaywisePressureEvent(GetDaywisePressureEvent event, Emitter<DashboardState> emit)async {
-    if(!loadedPressure) {
-      emit(GetDaywisePressureLoadingState());
-    }else{
-      emit(GetDaywisePressureSuccessState(dayWisePressureList: pressureList));
-    }
-    try {
-      final res = await getResponse(url: AppUrls.daywisePressure(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Pressure Data");
-      final DayWisePressuresModel dayWisePressuresModel = dayWisePressuresModelFromJson(res);
-      if(dayWisePressuresModel.success == true) {
-        loadedPressure = true;
-        pressureList = dayWisePressuresModel.data?? [];
-        emit(GetDaywisePressureSuccessState(dayWisePressureList: dayWisePressuresModel.data?? []));
-      }else{
-        logger.e(dayWisePressuresModel.message??"Failed to get daywise pressure data");
-        emit(GetDaywisePressureFailedState(errorMessage: dayWisePressuresModel.message??"Failed to get daywise pressure data"));
-      }
-    } catch (e) {
-      logger.e(e.toString());
-      emit(GetDaywisePressureFailedState(errorMessage: e.toString()));
-    }
-  }
+  // FutureOr<void> getDaywisePressureEvent(GetDaywisePressureEvent event, Emitter<DashboardState> emit)async {
+  //   if(!loadedPressure) {
+  //     emit(GetDaywisePressureLoadingState());
+  //   }else{
+  //     emit(GetDaywisePressureSuccessState(dayWisePressureList: pressureList));
+  //   }
+  //   try {
+  //     final res = await getResponse(url: AppUrls.daywisePressure(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Pressure Data");
+  //     final DayWisePressuresModel dayWisePressuresModel = dayWisePressuresModelFromJson(res);
+  //     if(dayWisePressuresModel.success == true) {
+  //       loadedPressure = true;
+  //       pressureList = dayWisePressuresModel.data?? [];
+  //       emit(GetDaywisePressureSuccessState(dayWisePressureList: dayWisePressuresModel.data?? []));
+  //     }else{
+  //       logger.e(dayWisePressuresModel.message??"Failed to get daywise pressure data");
+  //       emit(GetDaywisePressureFailedState(errorMessage: dayWisePressuresModel.message??"Failed to get daywise pressure data"));
+  //     }
+  //   } catch (e) {
+  //     logger.e(e.toString());
+  //     emit(GetDaywisePressureFailedState(errorMessage: e.toString()));
+  //   }
+  // }
 
-  FutureOr<void> getDaywiseGlucoseEvent(GetDaywiseGlucoseEvent event, Emitter<DashboardState> emit)async {
-    if(!loadedGlucose) {
-      emit(GetDaywiseGlucoseLoadingState());
-    }else{
-      emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: glucoseList));
-    }
-    try {
-      final res = await getResponse(url: AppUrls.daywiseGlucose(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Glucose Data");
-      final DayWiseGlucoseModel dayWiseGlucoseModel = dayWiseGlucoseModelFromJson(res);
-      if(dayWiseGlucoseModel.success == true) {
-        loadedGlucose = true;
-        glucoseList = dayWiseGlucoseModel.data?? [];
-        emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: dayWiseGlucoseModel.data?? []));
-      }else{
-        logger.e(dayWiseGlucoseModel.message??"Failed to get daywise Glucose data");
-        emit(GetDaywisePressureFailedState(errorMessage: dayWiseGlucoseModel.message??"Failed to get daywise Glucose data"));
-      }
-    } catch (e) {
-      logger.e(e.toString());
-      emit(GetDaywisePressureFailedState(errorMessage: e.toString()));
-    }
-  }
+  // FutureOr<void> getDaywiseGlucoseEvent(GetDaywiseGlucoseEvent event, Emitter<DashboardState> emit)async {
+  //   if(!loadedGlucose) {
+  //     emit(GetDaywiseGlucoseLoadingState());
+  //   }else{
+  //     emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: glucoseList));
+  //   }
+  //   try {
+  //     final res = await getResponse(url: AppUrls.daywiseGlucose(id: await LocalDB.getId()??"", days: 1), from: "Get Daywise Glucose Data");
+  //     final DayWiseGlucoseModel dayWiseGlucoseModel = dayWiseGlucoseModelFromJson(res);
+  //     if(dayWiseGlucoseModel.success == true) {
+  //       loadedGlucose = true;
+  //       glucoseList = dayWiseGlucoseModel.data?? [];
+  //       emit(GetDaywiseGlucoseSuccessState(dayWiseGlucoseList: dayWiseGlucoseModel.data?? []));
+  //     }else{
+  //       logger.e(dayWiseGlucoseModel.message??"Failed to get daywise Glucose data");
+  //       emit(GetDaywisePressureFailedState(errorMessage: dayWiseGlucoseModel.message??"Failed to get daywise Glucose data"));
+  //     }
+  //   } catch (e) {
+  //     logger.e(e.toString());
+  //     emit(GetDaywisePressureFailedState(errorMessage: e.toString()));
+  //   }
+  // }
 }
