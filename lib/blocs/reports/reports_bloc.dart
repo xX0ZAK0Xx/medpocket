@@ -19,6 +19,12 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     on<CreateFolderEvent>(createFolderEvent);
     on<UpdateFolderEvent>(updateFolderEvent);
     on<DeleteFolderEvent>(deleteFolderEvent);
+
+    //?Reports
+    on<GetAllReportEvents>(getAllReportEvents);
+    on<CreateReportEvent>(createReportEvent);
+    on<UpdateReportEvent>(updateReportEvent);
+    on<DeleteReportEvent>(deleteReportEvent);
   }
 
   FutureOr<void> getAllFoldersEvent(GetAllFoldersEvent event, Emitter<ReportsState> emit) async {
@@ -77,18 +83,100 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   }
 
   FutureOr<void> deleteFolderEvent(DeleteFolderEvent event, Emitter<ReportsState> emit) async {
-    emit(UpdateFolderLoadingState());
+    emit(DeleteFolderLoadingState());
     try {
       final res = await deleteResponse(url: AppUrls.reportFolder(delete: true, id: event.folderId), token: event.token, from: "delete folder");
       final ResponseModel responseModel = responseModelFromJson(res);
       if(responseModel.success == true) {
-        emit(UpdateFolderSuccessState());
+        emit(DeleteFolderSuccessState());
       }else{
-        emit(UpdateFolderFailedState(errorMessage: responseModel.message??"Something went wrong"));
+        emit(DeleteFolderFailedState(errorMessage: responseModel.message??"Something went wrong"));
       }
     } catch (e, k) {
       logger.e("$e: $k");
-      emit(UpdateFolderFailedState(errorMessage: e.toString()));
+      emit(DeleteFolderFailedState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> getAllReportEvents(GetAllReportEvents event, Emitter<ReportsState> emit) async {
+    emit(GetAllReportLoadingState());
+    try {
+      final res = await getResponse(url: AppUrls.reports(getAll: true, userId: await LocalDB.getId()??"", folderId: event.folderId), from: "Get All Reports Event", token: event.token);
+      final AllReportsOfFolderModel allReportsOfFolderModel = allReportsOfFolderModelFromJson(res);
+      if(allReportsOfFolderModel.success == true && allReportsOfFolderModel.data != null) {
+        emit(GetAllReportSuccessState(reportList: allReportsOfFolderModel.data!));
+      }else{
+        emit(GetAllReportFailedState(errorMessage: allReportsOfFolderModel.message??"Something went wrong"));
+      }
+    } catch (e, k) {
+      logger.e("$e: $k");
+      emit(GetAllReportFailedState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> createReportEvent(CreateReportEvent event, Emitter<ReportsState> emit) async {
+    emit(CreateReportLoadingState());
+    try {
+      final Map<String, String> payload = {
+          "userId": await LocalDB.getId()??"",
+          "folderId": event.folderId,
+          "title": event.title,
+          "description": event.description,
+          "hospitalName" : event.hospitalName,
+      };
+      Map<String, String> imagePayload = {
+        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i],
+      };
+      final res = await postImageResponse(url: AppUrls.reports(upload: true), token: event.token, payload: payload, imageName: "images", photoPath: imagePayload);
+      final ResponseModel responseModel = responseModelFromJson(res);
+      if(responseModel.success == true) {
+        emit(CreateReportSuccessState());
+      }else{
+        emit(CreateReportFailedState(errorMessage: responseModel.message??"Something went wrong"));
+      }
+    } catch (e, k) {
+      logger.e("$e: $k");
+      emit(CreateReportFailedState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> updateReportEvent(UpdateReportEvent event, Emitter<ReportsState> emit) async {
+    emit(UpdateReportLoadingState());
+    try {
+      final Map<String, String> payload = {
+          "title": event.title,
+          "description": event.description,
+          "hospitalName" : event.hospitalName,
+      };
+      Map<String, String> imagePayload = {
+        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i],
+      };
+      final res = await putImageResponse(url: AppUrls.reports(update: true, id: event.reportId), token: event.token, payload: payload, photoPath: imagePayload, from: "Update Report", imageName: "images");
+      final ResponseModel responseModel = responseModelFromJson(res);
+      if(responseModel.success == true) {
+        emit(UpdateReportSuccessState());
+      }else{
+        emit(UpdateReportFailedState(errorMessage: responseModel.message??"Something went wrong"));
+      }
+    } catch (e, k) {
+      logger.e("$e: $k");
+      emit(UpdateReportFailedState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> deleteReportEvent(DeleteReportEvent event, Emitter<ReportsState> emit) async {
+    emit(DeleteReportLoadingState());
+    try {
+      final res = await deleteResponse(url: AppUrls.reports(delete: true, id: event.reportId), token: event.token, from: "delete report");
+      final ResponseModel responseModel = responseModelFromJson(res);
+      if(responseModel.success == true) {
+        emit(DeleteReportSuccessState());
+      }else{
+        emit(DeleteReportFailedState(errorMessage: responseModel.message??"Something went wrong"));
+      }
+    } catch (e, k) {
+      logger.e("$e: $k");
+      emit(DeleteReportFailedState(errorMessage: e.toString()));
     }
   }
 }
