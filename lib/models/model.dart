@@ -5,3 +5,5 @@ export './common/meta_model.dart';
 export './common/height_model.dart';
 export './dashboard/dashboard_model.dart';
 export './measurements/measurements_model.dart';
+export './reports/all_folders_model.dart';
+export './reports/all_reports_of_forlder_model.dart';

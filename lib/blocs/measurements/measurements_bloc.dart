@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_urls.dart';
 import 'package:medpocket/database/local_db.dart';

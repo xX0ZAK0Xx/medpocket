@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medpocket/blocs/bloc/measurements_bloc.dart';
+import 'package:medpocket/blocs/measurements/measurements_bloc.dart';
 import 'package:medpocket/utils/utils.dart';
 
 import '../../../../configs/app_sizes.dart';

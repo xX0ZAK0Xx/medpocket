@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/repositories/post_response.dart';
 import '../../configs/app_constants.dart';
 import '../../configs/app_urls.dart';

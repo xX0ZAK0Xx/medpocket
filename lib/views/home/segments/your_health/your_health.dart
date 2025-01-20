@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medpocket/blocs/bloc/measurements_bloc.dart';
+import 'package:medpocket/blocs/measurements/measurements_bloc.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/widgets/app_snackbar.dart';

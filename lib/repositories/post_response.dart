@@ -60,6 +60,7 @@ Future<String> postImageResponse({
   Map<String, String>? photoPath,
   required String token,
   String? from,
+  String? imageName,
 }) async {
   Uri uriUrl = Uri.parse(url);
 
@@ -87,7 +88,7 @@ Future<String> postImageResponse({
         
         // Add the photo to the request
         request.files.add(await http.MultipartFile.fromPath(
-          entry.key, filePath,
+          imageName ?? entry.key, filePath,
           contentType: MediaType.parse(mimeType), // Set the correct MIME type
         ));
       }
