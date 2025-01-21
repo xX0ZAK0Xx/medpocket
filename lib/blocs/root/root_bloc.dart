@@ -18,9 +18,12 @@ class RootBloc extends Bloc<RootEvent, RootState> {
   }
 
   FutureOr<void> rootInitialEvent(RootInitialEvent event, Emitter<RootState> emit) {
-    currentPage = 0;
+    //TODO: Uncomment the following lines
+    // currentPage = 0;
+    // emit(NavigateToHomeState());
     _pageHistory.clear(); // Clear history on app start
-    emit(NavigateToHomeState());
+    currentPage = 2;
+    emit(NavigateToReportsState());
   }
 
   FutureOr<void> navigateToHomeEvent(NavigateToHomeEvent event, Emitter<RootState> emit) {

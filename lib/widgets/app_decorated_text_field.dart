@@ -5,7 +5,7 @@ import '../configs/colors.dart';
 import 'widgets.dart';
 
 class AppDecoratedTextField extends StatelessWidget {
-  const AppDecoratedTextField({
+  AppDecoratedTextField({
     required this.textInputAction,
     required this.labelText,
     required this.hintText,
@@ -19,17 +19,17 @@ class AppDecoratedTextField extends StatelessWidget {
     this.prefixIcon,
     this.onEditingComplete,
     this.autofocus,
-    this.focusNode,
+    FocusNode? focusNode,
     this.readOnly = false,
-    this.fillColor, 
-    this.labelColor, 
-    this.hintColor, 
+    this.fillColor,
+    this.labelColor,
+    this.hintColor,
     this.textColor,
     this.isRequired,
     this.maxLines = 1,
-    this.needLabel = true, 
-    this.onTap
-  });
+    this.needLabel = true,
+    this.onTap,
+  }) : focusNode = focusNode ?? FocusNode();
 
   final void Function()? onTap;
   final void Function(String)? onChanged;
@@ -44,7 +44,7 @@ class AppDecoratedTextField extends StatelessWidget {
   final String hintText;
   final bool? autofocus;
   final bool readOnly;
-  final FocusNode? focusNode;
+  final FocusNode focusNode; // Default FocusNode
   final void Function()? onEditingComplete;
   final Color? fillColor;
   final Color? labelColor;
@@ -57,92 +57,100 @@ class AppDecoratedTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // Ensure the onTap works here
+      onTap: onTap ?? (() {
+        if (!readOnly) focusNode.requestFocus();
+      }),
       child: Container(
-        height: 60.h,
-        padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 4),
+        padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 2),
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 225, 228, 235),
-          borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig * 1.5),
+          borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
-        child: Stack(
+        constraints: BoxConstraints(
+          minHeight: 60.h, // Fixed height when there's no error
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (needLabel)
-              Positioned(
-                top: 5.h,
-                left: 5.w,
-                child: Row(
-                  children: [
-                    Text(
-                      labelText,
-                      style: myText(color: labelColor ?? AppColors.textColorb3, fontWeight: FontWeight.w500),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (needLabel)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          labelText,
+                          style: myText(color: labelColor ?? AppColors.textColorb3, fontWeight: FontWeight.w500, fontSize: 12.sp),
+                        ),
+                        if (isRequired ?? false)
+                          SizedBox(width: 5.w),
+                        if (isRequired ?? false)
+                          Text(
+                            "*",
+                            style: myText(color: AppColors.red, fontWeight: FontWeight.w500, fontSize: 12.sp),
+                          ),
+                      ],
                     ),
-                    if (isRequired ?? false)
-                      SizedBox(width: 5.w),
-                    if (isRequired ?? false)
-                      Text(
-                        "*",
-                        style: myText(color: AppColors.red, fontWeight: FontWeight.w500),
+                  SizedBox(height: 5.h), // Spacing between label and input field
+                  IgnorePointer(
+                    ignoring: readOnly,
+                    child: TextFormField(
+                      maxLines: maxLines,
+                      controller: controller,
+                      keyboardType: keyboardType,
+                      textInputAction: textInputAction,
+                      focusNode: focusNode,
+                      onChanged: onChanged,
+                      autofocus: autofocus ?? false,
+                      obscureText: obscureText ?? false,
+                      obscuringCharacter: '*',
+                      onEditingComplete: onEditingComplete,
+                      readOnly: readOnly,
+                      cursorColor: textColor ?? AppColors.textColorb1,
+                      style: myText(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppColors.textColorb1),
+                      textAlignVertical: TextAlignVertical.center,
+                      autovalidateMode: AutovalidateMode.disabled, // Show errors only after interaction
+                      validator: validator,
+                      decoration: InputDecoration(
+                        errorMaxLines: 2,
+                        contentPadding: const EdgeInsets.all(0),
+                        prefixIcon: prefixIcon,
+                        hintText: hintText,
+                        isDense: true,
+                        filled: false,
+                        fillColor: fillColor ?? const Color.fromARGB(255, 225, 228, 235),
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        hintStyle: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: hintColor ?? Colors.grey.shade600,
+                          fontSize: 14.sp,
+                        ),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        errorBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.error(context), width: 0.5),
+                        ),
+                        focusedErrorBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.error(context), width: 0.5),
+                        ),
                       ),
-                  ],
-                ),
-              ),
-            Positioned(
-              left: 5.w,
-              bottom: 5.h,
-              right: 5.w, // Add a right constraint to avoid infinite width
-              child: SizedBox(
-                width: double.infinity, // Constrain the width of the TextFormField
-                child: IgnorePointer(
-                  ignoring: readOnly, // Ignore interactions when readOnly is true
-                  child: TextFormField(
-                    maxLines: maxLines,
-                    controller: controller,
-                    keyboardType: keyboardType,
-                    textInputAction: textInputAction,
-                    focusNode: focusNode,
-                    onChanged: onChanged,
-                    autofocus: autofocus ?? false,
-                    validator: validator,
-                    obscureText: obscureText ?? false,
-                    obscuringCharacter: '*',
-                    onEditingComplete: onEditingComplete,
-                    readOnly: readOnly,
-                    cursorColor: textColor ?? AppColors.textColorb1,
-                    style: myText(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppColors.textColorb1),
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      errorMaxLines: 2,
-                      contentPadding: const EdgeInsets.all(0),
-                      prefixIcon: prefixIcon,
-                      hintText: hintText,
-                      isDense: true,
-                      filled: false,
-                      fillColor: fillColor ?? const Color.fromARGB(255, 225, 228, 235),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      hintStyle: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: hintColor ?? Colors.grey.shade600,
-                        fontSize: 12.sp,
-                      ),
-                      enabledBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      errorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.error(context), width: 0.5),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.error(context), width: 0.5),
-                      ),
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
                     ),
-                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   ),
-                ),
+                ],
               ),
             ),
+            if (suffixIcon != null)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding),
+                child: suffixIcon,
+              ),
           ],
         ),
       ),

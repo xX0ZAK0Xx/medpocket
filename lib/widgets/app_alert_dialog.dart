@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
 import '../configs/colors.dart';
 
 
@@ -18,7 +16,7 @@ Future<void> appAlertDialog(
     actions: actions,
   );
 
-  showDialog(
+  showCupertinoDialog(
     barrierDismissible: barrierDismissible,
     context: context,
     builder: (BuildContext context) {

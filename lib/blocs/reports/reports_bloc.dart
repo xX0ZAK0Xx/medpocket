@@ -13,6 +13,7 @@ part 'reports_event.dart';
 part 'reports_state.dart';
 
 class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
+  bool loadedFolders = false;
   ReportsBloc() : super(ReportsInitial()) {
     //?Folder
     on<GetAllFoldersEvent>(getAllFoldersEvent);
@@ -28,11 +29,12 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   }
 
   FutureOr<void> getAllFoldersEvent(GetAllFoldersEvent event, Emitter<ReportsState> emit) async {
-    emit(GetAllFolderLoadingState());
+    if(!loadedFolders) emit(GetAllFolderLoadingState());
     try {
       final res = await getResponse(url: AppUrls.reportFolder(getAll: true, userId: await LocalDB.getId()??""), from: "Get All Folders Event", token: event.token);
       final AllFoldersListModel allFoldersListModel = allFoldersListModelFromJson(res);
       if(allFoldersListModel.success == true && allFoldersListModel.data != null) {
+        loadedFolders = true;
         emit(GetAllFolderSuccessState(folderList: allFoldersListModel.data!));
       }else{
         emit(GetAllFolderFailedState(errorMessage: allFoldersListModel.message??"Something went wrong"));

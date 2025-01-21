@@ -19,9 +19,9 @@ class DeleteFolderEvent extends ReportsEvent{
   DeleteFolderEvent({required this.token, required this.folderId});
 }
 class GetAllFoldersEvent extends ReportsEvent{
-  final String token, userId;
+  final String token;
 
-  GetAllFoldersEvent({required this.token, required this.userId});
+  GetAllFoldersEvent({required this.token});
 }
 
 //!Reports
