@@ -78,8 +78,13 @@ class ReportsScreen extends StatelessWidget {
         builder: (context, state) {
           if(state is GetAllFolderLoadingState){
             return Center(child: CircularProgressIndicator.adaptive(),);
-          }else if(state is GetAllFolderSuccessState){
-            return GridView.builder(
+          }else if(state is GetAllFolderFailedState){
+            return Center(child: Padding(
+              padding: EdgeInsets.all(AppSizes.bodyPadding),
+              child: Text(state.errorMessage, style: myText(),),
+            ));
+          }
+          return GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 mainAxisSpacing: AppSizes.bodyPadding / 2, 
@@ -87,21 +92,11 @@ class ReportsScreen extends StatelessWidget {
                 mainAxisExtent: 130.h
               ),
               padding: EdgeInsets.all(AppSizes.bodyPadding),
-              itemCount: state.folderList.length,
+              itemCount: context.read<ReportsBloc>().folderList.length,
               itemBuilder: (context, index) {
-                return ReportFolderWidget(folderData: state.folderList[index]);
+                return ReportFolderWidget(folderData: context.read<ReportsBloc>().folderList[index]);
               },
             );
-          }else if(state is GetAllFolderFailedState){
-            return Center(child: Padding(
-              padding: EdgeInsets.all(AppSizes.bodyPadding),
-              child: Text(state.errorMessage, style: myText(),),
-            ));
-          }
-          return Center(child: Padding(
-            padding: EdgeInsets.all(AppSizes.bodyPadding),
-            child: Text("Something went wrong", style: myText(),),
-          ));
         },
       )
     );

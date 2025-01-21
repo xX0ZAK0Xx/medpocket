@@ -34,11 +34,7 @@ final class DeleteFolderFailedState extends ReportsState {
 
 //?Get all folders
 final class GetAllFolderLoadingState extends ReportsState {}
-final class GetAllFolderSuccessState extends ReportsState {
-  final List<FolderData> folderList;
-
-  GetAllFolderSuccessState({required this.folderList});
-}
+final class GetAllFolderSuccessState extends ReportsState {}
 final class GetAllFolderFailedState extends ReportsState {
   final String errorMessage;
 
