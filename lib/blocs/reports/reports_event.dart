@@ -14,7 +14,8 @@ class UpdateFolderEvent extends ReportsEvent {
   UpdateFolderEvent({required this.token, required this.name, required this.folderId});
 }
 class DeleteFolderEvent extends ReportsEvent{
-  final String token, folderId;
+  final String token;
+  final String folderId;
 
   DeleteFolderEvent({required this.token, required this.folderId});
 }

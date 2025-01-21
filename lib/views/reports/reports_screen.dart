@@ -68,8 +68,8 @@ class ReportsScreen extends StatelessWidget {
             ));
             context.read<ReportsBloc>().add(GetAllFoldersEvent(token: context.read<AuthBloc>().token??""));
           }else if(state is CreateFolderFailedState){
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Failed to create a new folder"),
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.errorMessage),
               duration: Duration(seconds: 1),
             ));
           }
