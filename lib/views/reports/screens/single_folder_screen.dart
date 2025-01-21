@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/models/model.dart';
 
 import '../../../blocs/bloc.dart';
+import '../../../configs/app_sizes.dart';
 import '../../../widgets/widgets.dart';
 
 class SingleFolderScreen extends StatelessWidget {
@@ -14,6 +16,7 @@ class SingleFolderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<ReportsBloc>().add(GetAllReportEvents(token: context.read<AuthBloc>().token??"", folderId: folderData.id??""));
     return BlocListener<ReportsBloc, ReportsState>(
       listener: (context, state) {
         if(state is DeleteFolderLoadingState){
@@ -93,7 +96,42 @@ class SingleFolderScreen extends StatelessWidget {
             }, icon: Icon(Icons.delete, color: AppColors.primary,))
           ],
         ),
+        body: BlocBuilder<ReportsBloc, ReportsState>(
+          buildWhen: (previous, current) => current is GetAllReportLoadingState || current is GetAllReportSuccessState || current is GetAllReportFailedState,
+          builder: (context, state) {
+            if(state is GetAllReportLoadingState){
+              return Center(child: CircularProgressIndicator.adaptive(),);
+            }else if(state is GetAllReportFailedState){
+              return Center(child: Padding(
+                padding: EdgeInsets.all(AppSizes.bodyPadding),
+                child: Text(state.errorMessage, style: myText(),),
+              ));
+            }else if(state is GetAllReportSuccessState){
+              return ListView.builder(
+                itemCount: state.reportList.length + 1,
+                itemBuilder: (context, index) => index < state.reportList.length ? ReportCardWidget(reportOfFolderData: state.reportList[index],) : SizedBox(height: AppSizes.bodyPadding * 6,),
+              );
+            }return Center(child: Padding(
+              padding: EdgeInsets.all(AppSizes.bodyPadding),
+              child: Text("Something went wrong", style: myText(),),
+            ));
+          },
+        ),
       ),
+    );
+  }
+}
+
+class ReportCardWidget extends StatelessWidget {
+  const ReportCardWidget({
+    super.key, required this.reportOfFolderData,
+  });
+  final ReportOfFolderData reportOfFolderData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text(reportOfFolderData.title??""),
     );
   }
 }

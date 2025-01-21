@@ -104,6 +104,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   FutureOr<void> getAllReportEvents(GetAllReportEvents event, Emitter<ReportsState> emit) async {
     emit(GetAllReportLoadingState());
     try {
+      // logger.d("url::: ${AppUrls.reports(getAll: true, userId: await LocalDB.getId()??"", folderId: event.folderId)}");
       final res = await getResponse(url: AppUrls.reports(getAll: true, userId: await LocalDB.getId()??"", folderId: event.folderId), from: "Get All Reports Event", token: event.token);
       final AllReportsOfFolderModel allReportsOfFolderModel = allReportsOfFolderModelFromJson(res);
       if(allReportsOfFolderModel.success == true && allReportsOfFolderModel.data != null) {

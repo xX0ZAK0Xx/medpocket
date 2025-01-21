@@ -32,7 +32,7 @@ class AppUrls {
   //!report
   static String reportFolder({String? id, String? userId, bool? create, bool? getAll, bool?update, bool? delete}) => "$baseUrl/api/folder${create==true?"/create-folder" : getAll == true ? "/all-folders/$userId" : update == true ? "/update-folder/$id" : delete == true ? "/delete-folder/$id" : ""}"; 
 
-  static String reports({String? id,String? userId, String? folderId, bool? upload, bool? getAll, bool?update, bool? delete}) => "$baseUrl/api/report${upload==true?"/upload" : getAll == true ? "all-reports/$folderId?userId=$userId" : update == true ? "/update-report/$id" : delete == true ? "/delete-report/$id" : ""}"; 
+  static String reports({String? id,String? userId, String? folderId, bool? upload, bool? getAll, bool?update, bool? delete}) => "$baseUrl/api/report${upload==true?"/upload" : getAll == true ? "/all-reports/$folderId?userId=$userId" : update == true ? "/update-report/$id" : delete == true ? "/delete-report/$id" : ""}"; 
 }
 /*
 api/report/upload
