@@ -9,6 +9,9 @@ import 'package:medpocket/models/model.dart';
 import '../../../blocs/bloc.dart';
 import '../../../configs/app_sizes.dart';
 import '../../../widgets/widgets.dart';
+import '../../views.dart';
+import 'segments/report_card_widget.dart';
+import 'shimmer_single_folder.dart';
 
 class SingleFolderScreen extends StatelessWidget {
   const SingleFolderScreen({super.key, required this.folderData});
@@ -56,6 +59,12 @@ class SingleFolderScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            AppRoutes.push(context, CreateUpdateReportScreen());
+          },
+          child: Icon(Icons.add),
+        ),
         appBar: AppBar(
           title: Text(folderData.name??""),
           actions: [
@@ -100,7 +109,14 @@ class SingleFolderScreen extends StatelessWidget {
           buildWhen: (previous, current) => current is GetAllReportLoadingState || current is GetAllReportSuccessState || current is GetAllReportFailedState,
           builder: (context, state) {
             if(state is GetAllReportLoadingState){
-              return Center(child: CircularProgressIndicator.adaptive(),);
+              // return Center(child: CircularProgressIndicator.adaptive(),);
+              return ListView.builder(
+                padding: EdgeInsets.all(AppSizes.bodyPadding),
+                itemCount: 8,
+                itemBuilder: (context, index) {
+                  return ShimmerSingleFolder();
+                },
+              );
             }else if(state is GetAllReportFailedState){
               return Center(child: Padding(
                 padding: EdgeInsets.all(AppSizes.bodyPadding),
@@ -108,8 +124,9 @@ class SingleFolderScreen extends StatelessWidget {
               ));
             }else if(state is GetAllReportSuccessState){
               return ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding),
                 itemCount: state.reportList.length + 1,
-                itemBuilder: (context, index) => index < state.reportList.length ? ReportCardWidget(reportOfFolderData: state.reportList[index],) : SizedBox(height: AppSizes.bodyPadding * 6,),
+                itemBuilder: (context, index) => index < state.reportList.length ? ReportCardWidget(reportOfFolderData: state.reportList[index], reversed: index%2==0,) : SizedBox(height: AppSizes.bodyPadding * 6,),
               );
             }return Center(child: Padding(
               padding: EdgeInsets.all(AppSizes.bodyPadding),
@@ -118,20 +135,6 @@ class SingleFolderScreen extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-}
-
-class ReportCardWidget extends StatelessWidget {
-  const ReportCardWidget({
-    super.key, required this.reportOfFolderData,
-  });
-  final ReportOfFolderData reportOfFolderData;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Text(reportOfFolderData.title??""),
     );
   }
 }
