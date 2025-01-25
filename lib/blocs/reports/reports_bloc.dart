@@ -1,8 +1,11 @@
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/models/model.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import '../../configs/app_constants.dart';
 import '../../configs/app_urls.dart';
@@ -158,26 +161,64 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     emit(UpdateReportLoadingState());
     try {
       final Map<String, String> payload = {
-          "title": event.title,
-          "description": event.description,
-          "hospitalName" : event.hospitalName,
+        "title": event.title,
+        "description": event.description,
+        "hospitalName": event.hospitalName,
       };
-      Map<String, String> imagePayload = {
-        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i].path,
-      };
-      final res = await putImageResponse(url: AppUrls.reports(update: true, id: event.reportId), token: event.token, payload: payload, photoPath: imagePayload, from: "Update Report", imageName: "images");
+
+      final Map<String, String> imagePayload = {};
+
+      for (int i = 0; i < event.images.length; i++) {
+        if (event.images[i].isOnline) {
+          // Handle online image: download and store temporarily
+          try {
+            final tempFile = await downloadImage(event.images[i].path);
+            imagePayload['photo_$i'] = tempFile.path;
+          } catch (e) {
+            logger.e("Failed to download image: ${event.images[i].path}, error: $e");
+          }
+        } else {
+          // Handle device image
+          imagePayload['photo_$i'] = event.images[i].path;
+        }
+      }
+
+      // Send the request
+      final res = await putImageResponse(
+        url: AppUrls.reports(update: true, id: event.reportId),
+        token: event.token,
+        payload: payload,
+        photoPath: imagePayload,
+        from: "Update Report",
+        imageName: "images",
+      );
+
       logger.e("res: $res");
       final ResponseModel responseModel = responseModelFromJson(res);
-      if(responseModel.success == true) {
+
+      if (responseModel.success == true) {
         emit(UpdateReportSuccessState());
-      }else{
-        emit(UpdateReportFailedState(errorMessage: responseModel.message??"Something went wrong"));
+      } else {
+        emit(UpdateReportFailedState(errorMessage: responseModel.message ?? "Something went wrong"));
       }
     } catch (e, k) {
       logger.e("$e: $k");
       emit(UpdateReportFailedState(errorMessage: e.toString()));
     }
   }
+  
+  Future<File> downloadImage(String url) async {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      return file;
+    } else {
+      throw Exception('Failed to download image: $url');
+    }
+  }
+
 
   FutureOr<void> deleteReportEvent(DeleteReportEvent event, Emitter<ReportsState> emit) async {
     emit(DeleteReportLoadingState());
