@@ -154,6 +154,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   }
 
   FutureOr<void> updateReportEvent(UpdateReportEvent event, Emitter<ReportsState> emit) async {
+    logger.i("url: ${AppUrls.reports(update: true, id: event.reportId)}");
     emit(UpdateReportLoadingState());
     try {
       final Map<String, String> payload = {
@@ -162,9 +163,10 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
           "hospitalName" : event.hospitalName,
       };
       Map<String, String> imagePayload = {
-        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i],
+        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i].path,
       };
       final res = await putImageResponse(url: AppUrls.reports(update: true, id: event.reportId), token: event.token, payload: payload, photoPath: imagePayload, from: "Update Report", imageName: "images");
+      logger.e("res: $res");
       final ResponseModel responseModel = responseModelFromJson(res);
       if(responseModel.success == true) {
         emit(UpdateReportSuccessState());

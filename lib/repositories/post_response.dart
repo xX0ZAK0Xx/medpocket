@@ -79,10 +79,7 @@ Future<String> postImageResponse({
         String filePath = entry.value;
 
         // Get the MIME type from the file extension
-        String? mimeType = lookupMimeType(filePath);
-
-        logger.d("file: $filePath\nmime: $mimeType");
-        
+        String? mimeType = lookupMimeType(filePath);        
         // If the mime type is null, default to 'application/octet-stream'
         mimeType ??= 'application/octet-stream';
         

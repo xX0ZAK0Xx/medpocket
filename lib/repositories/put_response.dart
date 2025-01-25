@@ -32,10 +32,7 @@ Future<String> putImageResponse({
         String filePath = entry.value;
 
         // Get the MIME type from the file extension
-        String? mimeType = lookupMimeType(filePath);
-
-        logger.d("file: $filePath\nmime: $mimeType");
-        
+        String? mimeType = lookupMimeType(filePath);        
         // If the mime type is null, default to 'application/octet-stream'
         mimeType ??= 'application/octet-stream';
         
@@ -85,7 +82,7 @@ Future<String> putImageResponse({
 {
    "success": false,
    "title": "Failed",
-   "message": "An error occurred while communicating with the server",
+   "message": "An error occurred while communicating with the server $e",
    "data": null
 }
 ''';

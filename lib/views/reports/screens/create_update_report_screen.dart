@@ -7,6 +7,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/blocs/bloc.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/app_sizes.dart';
+import 'package:medpocket/widgets/app_alert_dialog.dart';
 import 'package:medpocket/widgets/app_button.dart';
 import 'package:medpocket/widgets/app_decorated_text_field.dart';
 import 'package:medpocket/widgets/app_text_style.dart';
@@ -184,52 +185,99 @@ class _CreateUpdateReportScreenState extends State<CreateUpdateReportScreen> {
             ),
             SizedBox(height: AppSizes.bodyPadding * 4,),
             BlocConsumer<ReportsBloc, ReportsState>(
-              listenWhen: (previous, current) => current is CreateReportFailedState || current is CreateReportLoadingState || current is CreateReportSuccessState,
+              listenWhen: (previous, current) => current is CreateReportFailedState || current is CreateReportLoadingState || current is CreateReportSuccessState || current is UpdateReportLoadingState || current is UpdateReportSuccessState || current is UpdateReportFailedState || current is DeleteReportFailedState || current is DeleteReportLoadingState || current is DeleteReportSuccessState ,
               listener: (context, state) {
-                logger.f("create report state: $state");
                 if(state is CreateReportFailedState){
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(state.errorMessage),
                     duration: Duration(seconds: 1),
                   ));
-                }else if(state is CreateReportLoadingState){
+                }else if(state is CreateReportLoadingState || state is UpdateReportLoadingState || state is DeleteReportFailedState){
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("Please wait"),
                     duration: Duration(seconds: 1),
                   ));
-                }else if(state is CreateReportSuccessState){
+                }else if(state is CreateReportSuccessState || state is UpdateReportSuccessState){
                   AppRoutes.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("Report ${widget.reportOfFolderData != null ? "updated" : "created"} successfully"),
                     duration: Duration(seconds: 1),
                   ));
                   context.read<ReportsBloc>().add(GetAllReportEvents(token: context.read<AuthBloc>().token??"", folderId: widget.folderId));
+                }else if(state is UpdateReportFailedState){
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(state.errorMessage),
+                    duration: Duration(seconds: 1),
+                  ));
+                }else if(state is DeleteReportSuccessState){
+                  AppRoutes.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Report deleted successfully"),
+                    duration: Duration(seconds: 1),
+                  ));
+                  context.read<ReportsBloc>().add(GetAllReportEvents(token: context.read<AuthBloc>().token??"", folderId: widget.folderId));
+                }else if(state is DeleteReportFailedState){
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(state.errorMessage),
+                    duration: Duration(seconds: 1),
+                  ));
                 }
               },
               buildWhen: (previous, current) => current is CreateReportFailedState || current is CreateReportLoadingState || current is CreateReportSuccessState,
               builder: (context, state) {
-                return AppButton(
-                  press: () {
-                    if(imageBloc.resizedMultiImagesPath.isEmpty){
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Please select at least one image"),
-                        duration: Duration(seconds: 1),
-                      ));
-                    }else{
-                      if(formKey.currentState!.validate()){
-                        context.read<ReportsBloc>().add(
-                          CreateReportEvent(
-                            token: context.read<AuthBloc>().token??"", 
-                            folderId: widget.folderId, 
-                            title: titleController.text.trim(), 
-                            description: descriptionController.text.trim(), 
-                            hospitalName: hospitalController.text.trim(), 
-                            images: imageBloc.resizedMultiImagesPath)
-                        );
-                      }
-                    }
-                  },
-                  text: "Submit",
+                return Row(
+                  children: [
+                    if(widget.reportOfFolderData != null)
+                    IconButton(onPressed: (){
+                      appConfirmationDialog(context: context, title: "Delete the report", description: "Do you want to delete the report? Once deleted it can't be undone.", onTapYes: (){
+                        context.read<ReportsBloc>().add(DeleteReportEvent(token: context.read<AuthBloc>().token??"", reportId: widget.reportOfFolderData!.id??""));
+                      });
+                    }, icon: HugeIcon(
+                      icon: HugeIcons.strokeRoundedDelete02,
+                      color: AppColors.red,
+                      size: 24.0.sp,
+                    )),
+                    Expanded(
+                      child: AppButton(
+                        press: () {
+                          if(imageBloc.resizedMultiImagesPath.isEmpty){
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text("Please select at least one image"),
+                              duration: Duration(seconds: 1),
+                            ));
+                          }else{
+                            if(formKey.currentState!.validate()){
+                              if(widget.reportOfFolderData!= null){
+                                logger.i("updating report");
+                                context.read<ReportsBloc>().add(
+                                  UpdateReportEvent(
+                                    reportId: widget.reportOfFolderData!.id??"",
+                                    token: context.read<AuthBloc>().token??"", 
+                                    // folderId: widget.folderId, 
+                                    title: titleController.text.trim(), 
+                                    description: descriptionController.text.trim(), 
+                                    hospitalName: hospitalController.text.trim(), 
+                                    images: imageBloc.resizedMultiImagesPath)
+                                );
+                              }else{
+                                logger.i("Creating report");
+                                context.read<ReportsBloc>().add(
+                                  CreateReportEvent(
+                                    token: context.read<AuthBloc>().token??"", 
+                                    folderId: widget.folderId, 
+                                    title: titleController.text.trim(), 
+                                    description: descriptionController.text.trim(), 
+                                    hospitalName: hospitalController.text.trim(), 
+                                    images: imageBloc.resizedMultiImagesPath)
+                                );
+                              }
+                            }
+                          }
+                        },
+                        text: "Submit",
+                      ),
+                    ),
+                  ],
                 );
               },
             )

@@ -39,7 +39,7 @@ class DeleteReportEvent extends ReportsEvent {
 }
 class UpdateReportEvent extends ReportsEvent {
   final String token, reportId, title, description, hospitalName;
-  final List<String> images;
+  final List<ImageData> images;
 
   UpdateReportEvent({required this.token, required this.reportId, required this.title, required this.description, required this.hospitalName, required this.images});
 }
