@@ -34,7 +34,7 @@ class _ReportCardWidgetState extends State<ReportCardWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        AppRoutes.push(context, CreateUpdateReportScreen(reportOfFolderData: widget.reportOfFolderData,));
+        AppRoutes.push(context, CreateUpdateReportScreen(reportOfFolderData: widget.reportOfFolderData, folderId: widget.reportOfFolderData.folderId??"",));
       },
       child: Container(
         padding: EdgeInsets.all(AppSizes.bodyPadding),

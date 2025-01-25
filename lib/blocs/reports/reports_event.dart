@@ -28,7 +28,7 @@ class GetAllFoldersEvent extends ReportsEvent{
 //!Reports
 class CreateReportEvent extends ReportsEvent{
   final String token, folderId, title, description, hospitalName;
-  final List<String> images;
+  final List<ImageData> images;
 
   CreateReportEvent({required this.token, required this.folderId, required this.title, required this.description, required this.hospitalName, required this.images});
 }

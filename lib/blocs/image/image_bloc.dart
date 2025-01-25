@@ -13,13 +13,20 @@ import '../../configs/app_constants.dart';
 part 'image_event.dart';
 part 'image_state.dart';
 
+class ImageData {
+  final String path;
+  final bool isOnline;
+
+  ImageData({required this.path, required this.isOnline});
+}
+
 class ImageBloc extends Bloc<ImageEvent, ImageState> {
   final ImagePicker _imagePicker = ImagePicker();
   final int _targetWidth = 500;
 
   String originalImagePath = '';
   String resizedImagePath = '';
-  List<String> resizedMultiImagesPath = [];
+  List<ImageData> resizedMultiImagesPath = [];
   bool onlineImage = false;
   int index = 0;
 
@@ -61,6 +68,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
           ? [await _imagePicker.pickImage(source: ImageSource.camera) as XFile]
           : await _imagePicker.pickMultiImage();
 
+      emit(ImageLoadingState());
       for (final image in images) {
         final Uint8List imageBytes = await image.readAsBytes();
         await _processAndStoreImage(imageBytes, event.usedFor, isMultiple: true);
@@ -115,7 +123,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
       final File resizedImageFile = File(targetPath);
       await resizedImageFile.writeAsBytes(resizedImageBytes);
 
-      if (isMultiple) resizedMultiImagesPath.add(targetPath);
+      if (isMultiple) resizedMultiImagesPath.add(ImageData(path: targetPath, isOnline: false));
       return targetPath;
     }
     throw Exception("Failed to process image");

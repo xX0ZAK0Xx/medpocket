@@ -60,7 +60,7 @@ class SingleFolderScreen extends StatelessWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            AppRoutes.push(context, CreateUpdateReportScreen());
+            AppRoutes.push(context, CreateUpdateReportScreen(folderId: folderData.id??"",));
           },
           child: Icon(Icons.add),
         ),

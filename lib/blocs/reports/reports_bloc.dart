@@ -8,6 +8,7 @@ import '../../configs/app_constants.dart';
 import '../../configs/app_urls.dart';
 import '../../database/local_db.dart';
 import '../../repositories/repositories.dart';
+import '../image/image_bloc.dart';
 
 part 'reports_event.dart';
 part 'reports_state.dart';
@@ -125,12 +126,16 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
           "userId": await LocalDB.getId()??"",
           "folderId": event.folderId,
           "title": event.title,
-          "description": event.description,
+          if(event.description.isNotEmpty) "description": event.description,
           "hospitalName" : event.hospitalName,
       };
       Map<String, String> imagePayload = {
-        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i],
+        for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i].path,
       };
+
+      logger.i("payload: $payload");
+      logger.i("image payload: $imagePayload");
+
       final res = await postImageResponse(url: AppUrls.reports(upload: true), token: event.token, payload: payload, imageName: "images", photoPath: imagePayload);
       final ResponseModel responseModel = responseModelFromJson(res);
       if(responseModel.success == true) {
