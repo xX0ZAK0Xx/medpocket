@@ -63,7 +63,7 @@ class AppDecoratedTextField extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 2),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 225, 228, 235),
+          color: const Color.fromARGB(255, 226, 228, 234),
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
         constraints: BoxConstraints(

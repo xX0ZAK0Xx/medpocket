@@ -10,3 +10,16 @@ class SelectImageEvent extends ImageEvent {
 }
 
 class ValidateImageEvent extends ImageEvent {}
+
+class SelectMultipleImagesEvent extends ImageEvent {
+  final bool fromCamera;
+  final String usedFor;
+
+  SelectMultipleImagesEvent({required this.fromCamera, required this.usedFor});
+}
+
+class DeleteImageEvent extends ImageEvent {
+  final int index;
+
+  DeleteImageEvent(this.index);
+}

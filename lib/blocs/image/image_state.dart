@@ -9,3 +9,7 @@ final class ImageActionState extends ImageState {}
 final class ImageSelectSuccessState extends ImageActionState {}
 final class ImageSelectFailedState extends ImageActionState {}
 final class ImageNotSelectState extends ImageActionState {}
+
+class ImageDeleteSuccessState extends ImageState {}
+
+class ImageDeleteFailedState extends ImageState {}

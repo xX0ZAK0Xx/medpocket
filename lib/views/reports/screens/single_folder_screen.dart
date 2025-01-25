@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/models/model.dart';
