@@ -6,6 +6,7 @@ import 'package:medpocket/configs/colors.dart';
 import 'package:medpocket/models/model.dart';
 
 import '../../../blocs/bloc.dart';
+import '../../../configs/app_constants.dart';
 import '../../../configs/app_sizes.dart';
 import '../../../widgets/widgets.dart';
 import '../../views.dart';
@@ -107,6 +108,7 @@ class SingleFolderScreen extends StatelessWidget {
         body: BlocBuilder<ReportsBloc, ReportsState>(
           buildWhen: (previous, current) => current is GetAllReportLoadingState || current is GetAllReportSuccessState || current is GetAllReportFailedState,
           builder: (context, state) {
+            logger.f("get report state: $state");
             if(state is GetAllReportLoadingState){
               // return Center(child: CircularProgressIndicator.adaptive(),);
               return ListView.builder(
@@ -125,7 +127,7 @@ class SingleFolderScreen extends StatelessWidget {
               return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding),
                 itemCount: state.reportList.length + 1,
-                itemBuilder: (context, index) => index < state.reportList.length ? ReportCardWidget(reportOfFolderData: state.reportList[index], reversed: index%2==0,) : SizedBox(height: AppSizes.bodyPadding * 6,),
+                itemBuilder: (context, index) => state.reportList.isEmpty ? AppNothingToDisplay() : index < state.reportList.length ? ReportCardWidget(reportOfFolderData: state.reportList[index], reversed: index%2==0,) : SizedBox(height: AppSizes.bodyPadding * 6,),
               );
             }return Center(child: Padding(
               padding: EdgeInsets.all(AppSizes.bodyPadding),

@@ -15,7 +15,11 @@ part 'reports_state.dart';
 
 class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   List<FolderData> folderList = [];
-  
+
+  //for get reports
+  bool loadedReports = false;
+  String lastFolderId = "";
+
   ReportsBloc() : super(ReportsInitial()) {
     //?Folder
     on<GetAllFoldersEvent>(getAllFoldersEvent);
@@ -37,6 +41,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       final AllFoldersListModel allFoldersListModel = allFoldersListModelFromJson(res);
       if(allFoldersListModel.success == true && allFoldersListModel.data != null) {
         folderList = allFoldersListModel.data ?? [];
+        loadedReports = false;
         emit(GetAllFolderSuccessState());
       }else{
         emit(GetAllFolderFailedState(errorMessage: allFoldersListModel.message??"Something went wrong"));
@@ -103,12 +108,14 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   }
 
   FutureOr<void> getAllReportEvents(GetAllReportEvents event, Emitter<ReportsState> emit) async {
-    emit(GetAllReportLoadingState());
+    if(!loadedReports || lastFolderId != event.folderId) emit(GetAllReportLoadingState());
     try {
       // logger.d("url::: ${AppUrls.reports(getAll: true, userId: await LocalDB.getId()??"", folderId: event.folderId)}");
       final res = await getResponse(url: AppUrls.reports(getAll: true, userId: await LocalDB.getId()??"", folderId: event.folderId), from: "Get All Reports Event", token: event.token);
       final AllReportsOfFolderModel allReportsOfFolderModel = allReportsOfFolderModelFromJson(res);
-      if(allReportsOfFolderModel.success == true && allReportsOfFolderModel.data != null) {
+      if(allReportsOfFolderModel.success == true) {
+        loadedReports = true;
+        lastFolderId = event.folderId;
         emit(GetAllReportSuccessState(reportList: allReportsOfFolderModel.data!));
       }else{
         emit(GetAllReportFailedState(errorMessage: allReportsOfFolderModel.message??"Something went wrong"));
@@ -132,9 +139,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       Map<String, String> imagePayload = {
         for (int i = 0; i < event.images.length; i++) 'photo_$i': event.images[i].path,
       };
-
-      logger.i("payload: $payload");
-      logger.i("image payload: $imagePayload");
 
       final res = await postImageResponse(url: AppUrls.reports(upload: true), token: event.token, payload: payload, imageName: "images", photoPath: imagePayload);
       final ResponseModel responseModel = responseModelFromJson(res);

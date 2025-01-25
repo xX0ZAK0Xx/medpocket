@@ -186,6 +186,7 @@ class _CreateUpdateReportScreenState extends State<CreateUpdateReportScreen> {
             BlocConsumer<ReportsBloc, ReportsState>(
               listenWhen: (previous, current) => current is CreateReportFailedState || current is CreateReportLoadingState || current is CreateReportSuccessState,
               listener: (context, state) {
+                logger.f("create report state: $state");
                 if(state is CreateReportFailedState){
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(state.errorMessage),
@@ -202,7 +203,7 @@ class _CreateUpdateReportScreenState extends State<CreateUpdateReportScreen> {
                     content: Text("Report ${widget.reportOfFolderData != null ? "updated" : "created"} successfully"),
                     duration: Duration(seconds: 1),
                   ));
-                  context.read<ReportsBloc>().add(GetAllReportEvents(token: context.read<AuthBloc>().token??"", folderId: widget.reportOfFolderData?.folderId??""));
+                  context.read<ReportsBloc>().add(GetAllReportEvents(token: context.read<AuthBloc>().token??"", folderId: widget.folderId));
                 }
               },
               buildWhen: (previous, current) => current is CreateReportFailedState || current is CreateReportLoadingState || current is CreateReportSuccessState,
