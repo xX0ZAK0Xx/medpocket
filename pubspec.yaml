@@ -57,6 +57,9 @@ dependencies:
   flutter_bloc: ^9.0.0
   cached_network_image: ^3.4.1
   carousel_slider: ^5.0.0
+  permission_handler: ^11.3.1
+  cunning_document_scanner: ^1.2.3
+  google_mlkit_text_recognition: ^0.14.0
 
 dev_dependencies:
   flutter_test:
