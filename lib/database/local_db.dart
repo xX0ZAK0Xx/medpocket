@@ -18,7 +18,9 @@ class LocalDB {
   //!Get id 
   static Future<String?> getId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('id_med_pocket')?? "";
+    //TODO: Uncomment this line
+    // return prefs.getString('id_med_pocket')?? "";
+    return "671bca7f3c243fa0e37e9427";
   }
   //!Get id 
   static Future<void> setId({required String id}) async {
