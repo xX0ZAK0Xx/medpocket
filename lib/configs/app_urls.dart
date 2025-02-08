@@ -38,6 +38,7 @@ class AppUrls {
   static String todaysMedicine({required String userId}) => "$baseUrl/api/medicine/get-today-medicines/$userId";
   static String allMedicine({required String userId}) => "$baseUrl/api/medicine/get-all-medicines/$userId";
   static const String createMedicine = "$baseUrl/api/medicine/add-new-medicine";
+  static const String markAsTaken = "$baseUrl/api/medicine/mark-as-taken";
   static String updateMedicine({required String medicineId}) => "$baseUrl/api/medicine/update-medicine/$medicineId";
   static String deleteMedicine({required String medicineId}) => "$baseUrl/api/medicine/delete-medicine/$medicineId";
 }
