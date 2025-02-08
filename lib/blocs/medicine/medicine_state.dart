@@ -27,9 +27,9 @@ final class GetSingleMedicineFailedState extends MedicineState{
 //! Get Todays Medicine 
 final class GetTodaysMedicineLoadingState extends MedicineState{}
 final class GetTodaysMedicineSuccessState extends MedicineState{
-  final List<TodaysMedicineData> todaysMedicineList;
+  final TodaysMedicineData todaysMedicine;
 
-  GetTodaysMedicineSuccessState({required this.todaysMedicineList});
+  GetTodaysMedicineSuccessState({required this.todaysMedicine});
 }
 final class GetTodaysMedicineFailedState extends MedicineState {
   final String errorMessage;

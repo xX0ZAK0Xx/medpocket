@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+
 import '../model.dart';
 
 AllMedicineModel allMedicineModelFromJson(String str) => AllMedicineModel.fromJson(json.decode(str));
@@ -39,13 +41,13 @@ class AllMedicineModel {
 }
 
 class MedicineDataFull {
-    final MedicineDuration? duration;
+    final ValueNotifier<MedicineDuration>? duration;
     final String? id;
     final String? userId;
-    final String? medicineName;
-    final String? type;
-    final String? description;
-    final Dosage? dosage;
+    final TextEditingController? medicineName;
+    final TextEditingController? type;
+    final TextEditingController? description;
+    final ValueNotifier<Dosage>? dosage;
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final int? v;
@@ -64,26 +66,26 @@ class MedicineDataFull {
     });
 
     factory MedicineDataFull.fromJson(Map<String, dynamic> json) => MedicineDataFull(
-        duration: json["duration"] == null ? null : MedicineDuration.fromJson(json["duration"]),
+        duration: json["duration"] == null ? null : ValueNotifier(MedicineDuration.fromJson(json["duration"])),
         id: json["_id"],
         userId: json["userId"],
-        medicineName: json["medicineName"],
-        type: json["type"],
-        description: json["description"],
-        dosage: json["dosage"] == null ? null : Dosage.fromJson(json["dosage"]),
+        medicineName: TextEditingController(text: json["medicineName"] ?? ""),
+        type: TextEditingController(text: json["type"] ?? ""),
+        description: TextEditingController(text: json["description"] ?? ""),
+        dosage: json["dosage"] == null ? null : ValueNotifier(Dosage.fromJson(json["dosage"])),
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
-        "duration": duration?.toJson(),
+        "duration": duration?.value.toJson(),
         "_id": id,
         "userId": userId,
-        "medicineName": medicineName,
-        "type": type,
-        "description": description,
-        "dosage": dosage?.toJson(),
+        "medicineName": medicineName?.value,
+        "type": type?.text,
+        "description": description?.text,
+        "dosage": dosage?.value.toJson(),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
         "__v": v,

@@ -20,9 +20,13 @@ class GetSingleMedicineEvent extends MedicineEvent{
 }
 
 class UpdateMedicineEvent extends MedicineEvent{
-  final String token, medicineId;
+  final String token, medicineId, name, type, description;
+  final bool morningTake, morningAfterMeal, afterNoonTake, afterNoonAfterMeal, eveningTake, eveningAfterMeal;
 
-  UpdateMedicineEvent({required this.token, required this.medicineId});
+  final DateTime start, end;
+
+  UpdateMedicineEvent({required this.token, required this.medicineId, required this.name, required this.type, required this.description, required this.morningTake, required this.morningAfterMeal, required this.afterNoonTake, required this.afterNoonAfterMeal, required this.eveningTake, required this.eveningAfterMeal, required this.start, required this.end});
+  
 }
 
 class DeleteMedicineEvent extends MedicineEvent{

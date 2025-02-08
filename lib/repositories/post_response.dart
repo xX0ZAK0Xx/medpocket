@@ -10,7 +10,8 @@ import '../configs/app_constants.dart';
 
 Future<String> postResponse({
   required String url,
-  Map<String, dynamic>? payload,
+  // Map<String, dynamic>? payload,
+  payload,
   String? token,
 }) async {
   Uri uriUrl = Uri.parse(url);
