@@ -7,3 +7,5 @@ export './dashboard/dashboard_model.dart';
 export './measurements/measurements_model.dart';
 export './reports/all_folders_model.dart';
 export './reports/all_reports_of_forlder_model.dart';
+export './medicine/all_medicine_model.dart';
+export './medicine/todays_medicine_model.dart';

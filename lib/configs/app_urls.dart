@@ -33,6 +33,13 @@ class AppUrls {
   static String reportFolder({String? id, String? userId, bool? create, bool? getAll, bool?update, bool? delete}) => "$baseUrl/api/folder${create==true?"/create-folder" : getAll == true ? "/all-folders/$userId" : update == true ? "/update-folder/$id" : delete == true ? "/delete-folder/$id" : ""}"; 
 
   static String reports({String? id,String? userId, String? folderId, bool? upload, bool? getAll, bool?update, bool? delete}) => "$baseUrl/api/report${upload==true?"/upload" : getAll == true ? "/all-reports/$folderId?userId=$userId" : update == true ? "/update-report/$id" : delete == true ? "/delete-report/$id" : ""}"; 
+
+  //!Medicine
+  static String todaysMedicine({required String userId}) => "$baseUrl/api/medicine/get-today-medicines/$userId";
+  static String allMedicine({required String userId}) => "$baseUrl/api/medicine/get-all-medicines/$userId";
+  static const String createMedicine = "$baseUrl/api/medicine/add-new-medicine";
+  static String updateMedicine({required String medicineId}) => "$baseUrl/api/medicine/update-medicine/$medicineId";
+  static String deleteMedicine({required String medicineId}) => "$baseUrl/api/medicine/delete-medicine/$medicineId";
 }
 /*
 api/report/upload
