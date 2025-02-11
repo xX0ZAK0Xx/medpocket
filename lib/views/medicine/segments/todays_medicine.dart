@@ -21,6 +21,7 @@ class TodaysMedicineList extends StatefulWidget {
 class _TodaysMedicineListState extends State<TodaysMedicineList> {
   final ValueNotifier<int?> firstToTake = ValueNotifier<int?>(null);
   final ValueNotifier<String?> nextMedicine= ValueNotifier<String?>(null);
+  final ValueNotifier<int?> nextMedicineShift = ValueNotifier<int?>(null);
 
   @override
   void initState() {
@@ -29,18 +30,32 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
   }
 
   void findNextMedicine() {
-    List<MedicineData> allMedicines = [
-      ...(widget.todaysMedicineData.morning ?? []),
-      ...(widget.todaysMedicineData.afternoon ?? []),
-      ...(widget.todaysMedicineData.evening ?? [])
+    // Define the shifts in order
+    List<List<MedicineData>?> shifts = [
+      widget.todaysMedicineData.morning,
+      widget.todaysMedicineData.afternoon,
+      widget.todaysMedicineData.evening
     ];
 
-    // Find the first medicine where `hasTaken` is false
-    int? nextIndex = allMedicines.indexWhere((medicine) => medicine.hasTaken == false);
+    // Reset values before searching
+    nextMedicine.value = null;
+    nextMedicineShift.value = null;
 
-    // Update the notifier
-    nextMedicine.value = nextIndex != -1 ? allMedicines[nextIndex].id : null; 
+    // Iterate through the shifts in order (morning -> afternoon -> evening)
+    for (int shiftIndex = 0; shiftIndex < shifts.length; shiftIndex++) {
+      List<MedicineData>? shift = shifts[shiftIndex];
+      if (shift != null) {
+        for (MedicineData medicine in shift) {
+          if (!(medicine.hasTaken??false)) {
+            nextMedicineShift.value = shiftIndex;
+            nextMedicine.value = medicine.id;
+            return; // Exit once the first untaken medicine is found
+          }
+        }
+      }
+    }
   }
+
 
 
   @override
@@ -59,7 +74,7 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig)    
+            borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig * 5)    
           ),
           child: RichText(
             textAlign: TextAlign.center,
@@ -75,15 +90,15 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
         SizedBox(height: AppSizes.bodyPadding,),
         //?Morning,
         if(widget.todaysMedicineData.morning?.isNotEmpty == true)
-        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.morning??[], title: 'Morning', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(),),
+        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.morning??[], title: 'Morning', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(), nextMedicineShift: nextMedicineShift, shift: 0,),
         
         //?Afternoon
         if(widget.todaysMedicineData.afternoon?.isNotEmpty == true)
-        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.afternoon??[], title: 'Noon', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine()),
+        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.afternoon??[], title: 'Noon', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(), nextMedicineShift: nextMedicineShift, shift: 1,),
         
         //?Evening
         if(widget.todaysMedicineData.evening?.isNotEmpty == true)
-        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.evening??[], title: 'Evening', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine()),
+        MedicineShiftWidget(shiftDose: widget.todaysMedicineData.evening??[], title: 'Evening', nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(), nextMedicineShift: nextMedicineShift, shift: 2,),
       ],
     );
   }
@@ -91,12 +106,13 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
 
 class MedicineShiftWidget extends StatelessWidget {
   const MedicineShiftWidget({
-    super.key, required this.shiftDose, required this.title, required this.nextMedicine, required this.findNextMedicine,
+    super.key, required this.shiftDose, required this.title, required this.nextMedicine, required this.findNextMedicine, required this.nextMedicineShift, required this.shift,
   });
   final List<MedicineData> shiftDose;
   final String title;
-  final ValueNotifier nextMedicine;
+  final ValueNotifier nextMedicine, nextMedicineShift;
   final  VoidCallback findNextMedicine;
+  final int shift;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +132,7 @@ class MedicineShiftWidget extends StatelessWidget {
           if(nextMedicine.value == null && medicine.hasTaken == true){
             //make it the next to take 
           }
-          return MedicineTile(medicine: medicine, nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(),); 
+          return MedicineTile(medicine: medicine, nextMedicine: nextMedicine, findNextMedicine: ()=>findNextMedicine(), nextMedicineShift: nextMedicineShift, shift: shift,); 
         }),
         SizedBox(height: AppSizes.bodyPadding,),
       ],
@@ -127,9 +143,10 @@ class MedicineShiftWidget extends StatelessWidget {
 
 class MedicineTile extends StatefulWidget {
   final MedicineData medicine;
-  final ValueNotifier nextMedicine;
+  final ValueNotifier nextMedicine, nextMedicineShift;
   final VoidCallback findNextMedicine;
-  const MedicineTile({super.key, required this.medicine, required this.nextMedicine, required this.findNextMedicine});
+  final int shift;
+  const MedicineTile({super.key, required this.medicine, required this.nextMedicine, required this.findNextMedicine, required this.nextMedicineShift, required this.shift});
 
   @override
   MedicineTileState createState() => MedicineTileState();
@@ -166,7 +183,7 @@ class MedicineTileState extends State<MedicineTile> {
         return ValueListenableBuilder<bool>(
           valueListenable: hasTaken,
           builder: (context, takenValue, child) {
-            bool isNextToTake = widget.medicine.id == nextId;
+            bool isNextToTake = widget.medicine.id == nextId && widget.nextMedicineShift.value == widget.shift;
             return Container(
               padding: EdgeInsets.all(AppSizes.bodyPadding * (isNextToTake?2:1)),
               margin: EdgeInsets.symmetric(vertical: AppSizes.bodyPadding / 2),
@@ -256,14 +273,30 @@ class MedicineTileState extends State<MedicineTile> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      takenValue ? Icons.undo : Icons.check,
-                      color: takenValue ? Colors.orange : Colors.green,
-                      size: 26,
-                    ),
-                    onPressed: _toggleTaken,
-                  ),
+                  isNextToTake 
+                  ? IconButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(AppColors.white)
+                      ),
+                      icon: Icon(
+                        takenValue ? Icons.undo : Icons.check,
+                        color: AppColors.secondary,
+                        size: 26,
+                      ),
+                      onPressed: _toggleTaken,
+                    )
+                  : hasTaken.value == true 
+                    ? IconButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(AppColors.primary)
+                      ),
+                      icon: Icon(
+                        takenValue ? Icons.undo : Icons.check,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                      onPressed: _toggleTaken,
+                    ) : SizedBox.shrink()
                 ],
               ),
             );
