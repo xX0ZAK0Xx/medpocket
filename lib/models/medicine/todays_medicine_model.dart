@@ -67,7 +67,7 @@ class MedicineData {
     final String? medicineName;
     final String? type;
     final bool? afterMeal;
-    final bool? hasTaken;
+    bool? hasTaken;
 
     MedicineData({
         this.id,
