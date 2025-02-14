@@ -63,14 +63,14 @@ class AppDecoratedTextField extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: AppSizes.bodyPadding, vertical: AppSizes.bodyPadding / 2),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 226, 228, 234),
+          color: fillColor ?? const Color.fromARGB(255, 226, 228, 234),
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
         constraints: BoxConstraints(
           minHeight: 60.h, // Fixed height when there's no error
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(

@@ -42,7 +42,7 @@ class AppButton extends StatelessWidget {
             child: Text(
               text ?? "",
               style: myText(
-                color: txtColor ?? AppColors.textColorw1,
+                color: txtColor ?? AppColors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -13,6 +13,7 @@ part 'medicine_state.dart';
 
 class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   List<MedicineDataFull> allMedicine = [];
+  String token = "";
 
   MedicineBloc() : super(MedicineInitial()) {
     on<GetAllMedicineEvent>(getAllMedicineEvent);
@@ -27,6 +28,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   FutureOr<void> getAllMedicineEvent(GetAllMedicineEvent event, Emitter<MedicineState> emit) async {
     emit(GetAllMedicineLoadingState());
     try {
+      token = event.token;
       final res = await getResponse(url: AppUrls.allMedicine(userId: await LocalDB.getId() ?? ""), from: "Get AllMedicine Event", token: event.token,);
       final AllMedicineModel allMedicineModel = allMedicineModelFromJson(res);
 
@@ -183,8 +185,39 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   FutureOr<void> getSingleMedicineEvent(GetSingleMedicineEvent event, Emitter<MedicineState> emit) async {
     try {
       emit(GetSingleMedicineLoadingState());
-      final MedicineDataFull medicineDataFull = allMedicine.firstWhere((medicine)=>medicine.id == event.medicineId);
-      emit(GetSingleMedicineSuccessState(medicine: medicineDataFull));
+
+      int retryCount = 2;
+      while (allMedicine.isEmpty && retryCount > 0) {
+        final res = await getResponse(
+          url: AppUrls.allMedicine(userId: await LocalDB.getId() ?? ""), 
+          from: "Get AllMedicine Event", 
+          token: token,
+        );
+
+        final AllMedicineModel allMedicineModel = allMedicineModelFromJson(res);
+        if (allMedicineModel.success == true && allMedicineModel.data != null) {
+          allMedicine = allMedicineModel.data ?? [];
+        }
+        retryCount--;
+      }
+
+      // Check if we have medicine data after fetching
+      if (allMedicine.isEmpty) {
+        emit(GetSingleMedicineFailedState(errorMessage: "Could not load data. Please try again later."));
+        return;
+      }
+
+      // Try to find the medicine in the list
+      final medicine = allMedicine.firstWhere(
+        (medicine) => medicine.id == event.medicineId,
+        orElse: () => MedicineDataFull(id: "-1"), // Default value
+      );
+
+      if (medicine.id == "-1") {
+        emit(GetSingleMedicineFailedState(errorMessage: "Medicine not found."));
+      } else {
+        emit(GetSingleMedicineSuccessState(medicine: medicine));
+      }
     } catch (e, k) {
       logger.e("$e, $k");
       emit(GetSingleMedicineFailedState(errorMessage: e.toString()));
