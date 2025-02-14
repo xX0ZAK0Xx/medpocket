@@ -90,7 +90,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                 // Medicine Name
                 AppDecoratedTextField(
                   keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.done,
                   fillColor: AppColors.white,
                   labelText: "Name",
                   hintText: "Name of the medicine",

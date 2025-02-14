@@ -2,6 +2,6 @@ import 'package:logger/web.dart';
 
 class AppConstants {
   static const String appName             = 'Med Pocket';
-  static const List<String> medicineTypes = ["Tablet", "Capsule", "Injection"];
+  static const List<String> medicineTypes = ["Tablet", "Capsule", "Injection", "Drop"];
 }
 Logger logger = Logger();

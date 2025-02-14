@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
+import 'medicine_card.dart';
+
 class AddMedicineScreen extends StatefulWidget {
   const AddMedicineScreen({super.key});
 
@@ -43,7 +45,11 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             itemCount: medicines.length,
             itemBuilder: (context, index) {
               final medicine = medicines[index];
-              return _buildMedicineCard(medicine);
+              return MedicineCard(
+                medicine: medicine, 
+                index: index, delete: () {
+                deleteMedicine(index);
+              },);
             },
           );
         },
@@ -51,78 +57,12 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     );
   }
 
-  /// Creates a beautiful and unique card for each medicine
-  Widget _buildMedicineCard(Medicine medicine) {
-    return Card(
-      elevation: 6,
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              medicine.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Type: ${medicine.type}",
-              style: const TextStyle(
-                color: Colors.blueGrey,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              // alignment: WrapAlignment.spaceBetween,
-              spacing: 10,
-              runAlignment: WrapAlignment.spaceBetween,
-              children: [
-                _buildDosageIcon(medicine.isMorning, Icons.wb_sunny, "Morning"),
-                // const SizedBox(width: 12),
-                _buildDosageIcon(medicine.isNoon, Icons.access_time, "Noon"),
-                // const SizedBox(width: 12),
-                _buildDosageIcon(medicine.isEvening, Icons.nights_stay, "Evening"),
-              ],
-            ),
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Helper function to build the dosage icons for each time of day
-  Widget _buildDosageIcon(bool isTime, IconData icon, String label) {
-    return isTime
-        ? Row(
-          mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 18,
-                color: Colors.blue,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.blueGrey,
-                ),
-              ),
-            ],
-          )
-        : const SizedBox.shrink();
+  void deleteMedicine(final int index) {
+    if (index >= 0 && index < _medicinesWithDosage.value.length) {
+      final newList = List<Medicine>.from(_medicinesWithDosage.value);
+      newList.removeAt(index);
+      _medicinesWithDosage.value = newList; // ✅ Assign a new list to trigger UI update
+    }
   }
 
 
@@ -210,18 +150,4 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
     _medicinesWithDosage.value = [..._medicinesWithDosage.value, ...medicineData];
   }
-}
-
-class Medicine {
-  final String type;
-  final String name;
-  final bool isMorning, isNoon, isEvening;
-
-  Medicine({
-    required this.type,
-    required this.name,
-    required this.isMorning,
-    required this.isNoon,
-    required this.isEvening,
-  });
 }
