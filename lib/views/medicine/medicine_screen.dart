@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/widgets/app_nothing_to_display.dart';
+import 'package:medpocket/widgets/app_snackbar.dart';
 
 import '../../blocs/bloc.dart';
 import '../../configs/app_routes.dart';
@@ -17,9 +18,12 @@ class MedicineScreen extends StatefulWidget {
 class _MedicineScreenState extends State<MedicineScreen> {
   @override
   void initState() {
+    fetchData();
+    super.initState();
+  }
+  void fetchData(){
     context.read<MedicineBloc>().add(GetAllMedicineEvent(token: context.read<AuthBloc>().token??""));
     context.read<MedicineBloc>().add(GetTodaysMedicineEvent(token: context.read<AuthBloc>().token??""));
-    super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,29 @@ class _MedicineScreenState extends State<MedicineScreen> {
         },
         child: Icon(Icons.add),
       ),
-      body: BlocBuilder<MedicineBloc, MedicineState>(
+      body: BlocConsumer<MedicineBloc, MedicineState>(
+        listener: (context, state) {
+          if(state is UpdateMedicineLoadingState){
+            // AppSnackbar.loadingSnackbar(title: "Please wait", message: "We are updating your medicine");
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Please wait"),
+              duration: Duration(seconds: 1),
+            ));
+          }else if(state is UpdateMedicineSuccessState){
+            fetchData();
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Medicine has been updated successfully"),
+              duration: Duration(seconds: 1),
+            ));
+            // AppSnackbar.successSnackbar(title: "Success", message: "Medicine has been updated successfully");
+          }else if(state is UpdateMedicineFailedState){
+            // AppSnackbar.failedSnackbar(title: "Failed", message: state.errorMessage);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.errorMessage),
+              duration: Duration(seconds: 1),
+            ));
+          }
+        },
         buildWhen: (previous, current) => current is GetTodaysMedicineFailedState || current is GetTodaysMedicineLoadingState || current is GetTodaysMedicineSuccessState,
         builder: (context, state) {
           if(state is GetTodaysMedicineLoadingState){

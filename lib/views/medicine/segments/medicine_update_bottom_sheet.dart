@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/configs/app_constants.dart';
+import 'package:medpocket/configs/app_routes.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 import '../../../blocs/bloc.dart';
@@ -21,11 +22,15 @@ class MedicineUpdateBottomSheet extends StatefulWidget {
 class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
   final ValueNotifier<String> typeNotifier = ValueNotifier<String>("");
   ValueNotifier<DateTimeRange?> dateRangeNotifier= ValueNotifier<DateTimeRange?>(null);
+  final TextEditingController nameController = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     typeNotifier.dispose();
+    dateRangeNotifier.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -45,6 +50,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
         } else if (state is GetSingleMedicineSuccessState) {
           typeNotifier.value = state.medicine.type?.text ?? "";
           dateRangeNotifier.value = DateTimeRange(start: state.medicine.duration?.value.start??DateTime.now(), end: state.medicine.duration?.value.end??DateTime.now());
+          nameController.text = state.medicine.medicineName?.text??"";
 
           return Form(
             key: formKey,
@@ -88,7 +94,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                   fillColor: AppColors.white,
                   labelText: "Name",
                   hintText: "Name of the medicine",
-                  controller: state.medicine.medicineName ?? TextEditingController(),
+                  controller: nameController,
                   validator: (p0) => p0!.isEmpty ? "Please enter a name" : null,
                 ),
                 SizedBox(height: AppSizes.bodyPadding * 3),
@@ -106,7 +112,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                 // Dosage Selection
                 _buildDosageSelection(state.medicine.dosage?.value),
                 SizedBox(height: AppSizes.bodyPadding),
-                DateRangeSelector(dateRangeNotifier: dateRangeNotifier,),
+                DateRangeSelector(dateRangeNotifier: dateRangeNotifier,initalDate: DateTime(2025),),
                 SizedBox(height: AppSizes.bodyPadding * 2),
                 
                 // Save Button,
@@ -121,8 +127,24 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                     )),
                     Expanded(
                       child: AppButton(text: "Save", press: (){
+                        // logger.f("after meal: ${state.medicine.dosage?.value.morning?.afterMeal??false}");
+                        AppRoutes.pop(context);
                         if(formKey.currentState!.validate()){
-                      
+                          context.read<MedicineBloc>().add(UpdateMedicineEvent(
+                            token: context.read<AuthBloc>().token??"", 
+                            medicineId: widget.id, 
+                            name: nameController.text.trim(), 
+                            type: typeNotifier.value, 
+                            description: "", 
+                            morningTake: state.medicine.dosage?.value.morning?.take??false, 
+                            morningAfterMeal: state.medicine.dosage?.value.morning?.afterMeal??false, 
+                            afterNoonTake: state.medicine.dosage?.value.afternoon?.take??false, 
+                            afterNoonAfterMeal: state.medicine.dosage?.value.afternoon?.afterMeal??false, 
+                            eveningTake: state.medicine.dosage?.value.evening?.take??false, 
+                            eveningAfterMeal: state.medicine.dosage?.value.evening?.afterMeal??false, 
+                            start: state.medicine.duration?.value.start??DateTime.now(),
+                            end: state.medicine.duration?.value.end??DateTime.now()),
+                          );
                         }
                       }),
                     ),

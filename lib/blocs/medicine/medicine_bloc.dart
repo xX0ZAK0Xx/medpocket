@@ -87,6 +87,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
             "end": event.end.toIso8601String() // This is the end of today (midnight UTC next day)
         }
       };
+      logger.f("payload: $payload");
       final res = await putResponse(url: AppUrls.updateMedicine(medicineId: event.medicineId), token: event.token, payload: payload);
       final ResponseModel responseModel = responseModelFromJson(res);
 
