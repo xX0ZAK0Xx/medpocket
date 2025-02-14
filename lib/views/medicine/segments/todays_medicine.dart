@@ -24,9 +24,17 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
   final ValueNotifier<int?> nextMedicineShift = ValueNotifier<int?>(null);
 
   @override
+  void dispose() {
+    firstToTake.dispose();
+    nextMedicine.dispose();
+    nextMedicineShift.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
-    findNextMedicine();
+    // findNextMedicine();
   }
 
   void findNextMedicine() {
@@ -60,6 +68,7 @@ class _TodaysMedicineListState extends State<TodaysMedicineList> {
 
   @override
   Widget build(BuildContext context) {
+    findNextMedicine();
     int todaysTotal = (widget.todaysMedicineData.afternoon?.length??0) + (widget.todaysMedicineData.morning?.length??0) + (widget.todaysMedicineData.evening?.length??0);
     return ListView(
       physics: ClampingScrollPhysics(),

@@ -41,13 +41,13 @@ class AllMedicineModel {
 }
 
 class MedicineDataFull {
-    final ValueNotifier<MedicineDuration>? duration;
+    final MedicineDuration? duration;
     final String? id;
     final String? userId;
     final TextEditingController? medicineName;
     final TextEditingController? type;
     final TextEditingController? description;
-    final ValueNotifier<Dosage>? dosage;
+    final Dosage? dosage;
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final int? v;
@@ -66,26 +66,26 @@ class MedicineDataFull {
     });
 
     factory MedicineDataFull.fromJson(Map<String, dynamic> json) => MedicineDataFull(
-        duration: json["duration"] == null ? null : ValueNotifier(MedicineDuration.fromJson(json["duration"])),
+        duration: json["duration"] == null ? null : MedicineDuration.fromJson(json["duration"]),
         id: json["_id"],
         userId: json["userId"],
         medicineName: TextEditingController(text: json["medicineName"] ?? ""),
         type: TextEditingController(text: json["type"] ?? ""),
         description: TextEditingController(text: json["description"] ?? ""),
-        dosage: json["dosage"] == null ? null : ValueNotifier(Dosage.fromJson(json["dosage"])),
+        dosage: json["dosage"] == null ? null : Dosage.fromJson(json["dosage"]),
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
-        "duration": duration?.value.toJson(),
+        "duration": duration?.toJson(),
         "_id": id,
         "userId": userId,
         "medicineName": medicineName?.value,
         "type": type?.text,
         "description": description?.text,
-        "dosage": dosage?.value.toJson(),
+        "dosage": dosage?.toJson(),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
         "__v": v,
@@ -121,8 +121,8 @@ class Dosage {
 }
 
 class Dose {
-    final bool? take;
-    final bool? afterMeal;
+    final ValueNotifier<bool>? take;
+    final ValueNotifier<bool>? afterMeal;
 
     Dose({
         this.take,
@@ -130,8 +130,8 @@ class Dose {
     });
 
     factory Dose.fromJson(Map<String, dynamic> json) => Dose(
-        take: json["take"],
-        afterMeal: json["afterMeal"],
+        take: ValueNotifier<bool>(json["take"]??false),
+        afterMeal: ValueNotifier<bool>(json["afterMeal"]??false),
     );
 
     Map<String, dynamic> toJson() => {
@@ -141,8 +141,8 @@ class Dose {
 }
 
 class MedicineDuration {
-    final DateTime? start;
-    final DateTime? end;
+    final ValueNotifier<DateTime?>? start;
+    final ValueNotifier<DateTime?>? end;
 
     MedicineDuration({
         this.start,
@@ -150,12 +150,12 @@ class MedicineDuration {
     });
 
     factory MedicineDuration.fromJson(Map<String, dynamic> json) => MedicineDuration(
-        start: json["start"] == null ? null : DateTime.parse(json["start"]),
-        end: json["end"] == null ? null : DateTime.parse(json["end"]),
+        start: json["start"] == null ? null : ValueNotifier<DateTime?>(DateTime.parse(json["start"])),
+        end: json["end"] == null ? null : ValueNotifier<DateTime?>(DateTime.parse(json["end"])),
     );
 
     Map<String, dynamic> toJson() => {
-        "start": start?.toIso8601String(),
-        "end": end?.toIso8601String(),
+        "start": start?.value?.toIso8601String(),
+        "end": end?.value?.toIso8601String(),
     };
 }

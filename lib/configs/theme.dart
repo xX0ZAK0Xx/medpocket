@@ -44,6 +44,33 @@ class AppTheme {
         color: AppColors.primary, 
       ),
 
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
+        headerBackgroundColor: AppColors.bg,
+        headerForegroundColor: AppColors.textColorb1,
+        yearStyle: TextStyle(
+          fontSize: 16.sp,
+          color: AppColors.textColorb2,
+          fontWeight: FontWeight.w600,
+        ),
+        dayStyle: TextStyle(
+          fontSize: 14.sp,
+          color: AppColors.textColorb1,
+        ),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primary; // Background color for the selected day
+          }
+          return Colors.transparent; // Default background
+        }),
+        todayForegroundColor: WidgetStatePropertyAll(Colors.black),
+        todayBackgroundColor: WidgetStatePropertyAll(Colors.transparent), // Background for today's date
+        todayBorder: BorderSide(color: AppColors.black, width: 0.5), // Optional border for today
+        rangeSelectionBackgroundColor: AppColors.primary.withOpacity(0.1),
+        rangeSelectionOverlayColor: WidgetStatePropertyAll(AppColors.primary.withOpacity(0.5)),
+      ),
+
       // The color used for text fields
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,

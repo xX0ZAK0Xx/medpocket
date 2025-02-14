@@ -45,7 +45,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
   }
 
   FutureOr<void> getTodaysMedicineEvent(GetTodaysMedicineEvent event, Emitter<MedicineState> emit) async {
-    emit(GetTodaysMedicineLoadingState());
+    if(allMedicine.isEmpty)emit(GetTodaysMedicineLoadingState());
     try {
       final res = await getResponse(url: AppUrls.todaysMedicine(userId: await LocalDB.getId() ?? ""), from: "Get Todays Event", token: event.token,);
       final TodaysMedicineModel todaysMedicineModel = todaysMedicineModelFromJson(res);
@@ -129,21 +129,21 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
         "description": medicine.description?.text,
         "dosage": {
             "morning": {
-                "take": medicine.dosage?.value.morning?.take,
-                "afterMeal": medicine.dosage?.value.morning?.afterMeal
+                "take": medicine.dosage?.morning?.take?.value,
+                "afterMeal": medicine.dosage?.morning?.afterMeal?.value
             },
             "afternoon": {
-                "take": medicine.dosage?.value.afternoon?.take,
-                "afterMeal": medicine.dosage?.value.afternoon?.afterMeal
+                "take": medicine.dosage?.afternoon?.take?.value,
+                "afterMeal": medicine.dosage?.afternoon?.afterMeal?.value
             },
             "evening": {
-                "take": medicine.dosage?.value.evening?.take,
-                "afterMeal": medicine.dosage?.value.evening?.afterMeal
+                "take": medicine.dosage?.evening?.take?.value,
+                "afterMeal": medicine.dosage?.evening?.afterMeal?.value
             }
         },
         "duration": {
-            "start": medicine.duration?.value.start?.toIso8601String(), // This will match today's start (midnight UTC)
-            "end": medicine.duration?.value.end?.toIso8601String() // This is the end of today (midnight UTC next day)
+            "start": medicine.duration?.start?.value?.toIso8601String(), // This will match today's start (midnight UTC)
+            "end": medicine.duration?.end?.value?.toIso8601String() // This is the end of today (midnight UTC next day)
         }
       }).toList();
       final res = await postResponse(url: AppUrls.createMedicine, token: event.token, payload: payload);

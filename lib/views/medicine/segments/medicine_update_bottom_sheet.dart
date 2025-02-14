@@ -49,7 +49,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
           return Center(child: CircularProgressIndicator.adaptive());
         } else if (state is GetSingleMedicineSuccessState) {
           typeNotifier.value = state.medicine.type?.text ?? "";
-          dateRangeNotifier.value = DateTimeRange(start: state.medicine.duration?.value.start??DateTime.now(), end: state.medicine.duration?.value.end??DateTime.now());
+          dateRangeNotifier.value = DateTimeRange(start: state.medicine.duration?.start?.value??DateTime.now(), end: state.medicine.duration?.end?.value??DateTime.now());
           nameController.text = state.medicine.medicineName?.text??"";
 
           return Form(
@@ -110,7 +110,7 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                 // SizedBox(height: AppSizes.bodyPadding),
                 
                 // Dosage Selection
-                _buildDosageSelection(state.medicine.dosage?.value),
+                _buildDosageSelection(state.medicine.dosage),
                 SizedBox(height: AppSizes.bodyPadding),
                 DateRangeSelector(dateRangeNotifier: dateRangeNotifier,initalDate: DateTime(2025),),
                 SizedBox(height: AppSizes.bodyPadding * 2),
@@ -136,14 +136,14 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                             name: nameController.text.trim(), 
                             type: typeNotifier.value, 
                             description: "", 
-                            morningTake: state.medicine.dosage?.value.morning?.take??false, 
-                            morningAfterMeal: state.medicine.dosage?.value.morning?.afterMeal??false, 
-                            afterNoonTake: state.medicine.dosage?.value.afternoon?.take??false, 
-                            afterNoonAfterMeal: state.medicine.dosage?.value.afternoon?.afterMeal??false, 
-                            eveningTake: state.medicine.dosage?.value.evening?.take??false, 
-                            eveningAfterMeal: state.medicine.dosage?.value.evening?.afterMeal??false, 
-                            start: state.medicine.duration?.value.start??DateTime.now(),
-                            end: state.medicine.duration?.value.end??DateTime.now()),
+                            morningTake: state.medicine.dosage?.morning?.take?.value??false, 
+                            morningAfterMeal: state.medicine.dosage?.morning?.afterMeal?.value??false, 
+                            afterNoonTake: state.medicine.dosage?.afternoon?.take?.value??false, 
+                            afterNoonAfterMeal: state.medicine.dosage?.afternoon?.afterMeal?.value??false, 
+                            eveningTake: state.medicine.dosage?.evening?.take?.value??false, 
+                            eveningAfterMeal: state.medicine.dosage?.evening?.afterMeal?.value??false, 
+                            start: dateRangeNotifier.value?.start??DateTime.now(),
+                            end: dateRangeNotifier.value?.end??DateTime.now()),
                           );
                         }
                       }),
@@ -181,8 +181,8 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
   }
 
   Widget _buildDoseToggle(String time, Dose? dose) {
-    final ValueNotifier<bool> takeNotifier = ValueNotifier<bool>(dose?.take ?? false);
-    final ValueNotifier<bool> afterMealNotifier = ValueNotifier<bool>(dose?.afterMeal ?? false);
+    final ValueNotifier<bool> takeNotifier = dose?.take??ValueNotifier(false);
+    final ValueNotifier<bool> afterMealNotifier = dose?.afterMeal ?? ValueNotifier<bool>(false);
     return ValueListenableBuilder(
       valueListenable: takeNotifier,
       builder: (_, takeValue, __) {

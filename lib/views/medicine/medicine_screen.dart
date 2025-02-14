@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/widgets/app_nothing_to_display.dart';
-import 'package:medpocket/widgets/app_snackbar.dart';
 
 import '../../blocs/bloc.dart';
 import '../../configs/app_routes.dart';
