@@ -119,7 +119,8 @@ class _MedicineUpdateBottomSheetState extends State<MedicineUpdateBottomSheet> {
                 Row(
                   children: [
                     IconButton(onPressed: (){
-                      
+                      AppRoutes.pop(context);
+                      context.read<MedicineBloc>().add(DeleteMedicineEvent(token: context.read<AuthBloc>().token??"", medicineId: widget.id));
                     }, icon: HugeIcon(
                       icon: HugeIcons.strokeRoundedDelete02,
                       color: AppColors.primary,

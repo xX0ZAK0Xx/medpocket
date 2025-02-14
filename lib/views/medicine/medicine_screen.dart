@@ -62,6 +62,17 @@ class _MedicineScreenState extends State<MedicineScreen> {
               content: Text(state.errorMessage),
               duration: Duration(seconds: 2),
             ));
+          }else if(state is DeleteMedicineSuccessState){
+            fetchData();
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Medicine was successfully deleted"),
+              duration: Duration(seconds: 1),
+            ));
+          }else if(state is DeleteMedicineFailedState){
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.errorMessage),
+              duration: Duration(seconds: 1),
+            ));
           }
         },
         buildWhen: (previous, current) => current is GetTodaysMedicineFailedState || current is GetTodaysMedicineLoadingState || current is GetTodaysMedicineSuccessState,
