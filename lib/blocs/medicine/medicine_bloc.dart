@@ -169,6 +169,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
           "slotName": event.slotName.toLowerCase(),
           "hasTaken": event.hasTaken
       };
+      logger.i("payload: $payload");
       final res = await putResponse(url: AppUrls.markAsTaken, token: event.token, payload: payload);
       final ResponseModel responseModel = responseModelFromJson(res);
 

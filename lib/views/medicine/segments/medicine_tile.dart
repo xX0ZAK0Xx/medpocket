@@ -1,9 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medpocket/views/medicine/segments/medicine_update_bottom_sheet.dart';
 
+import '../../../blocs/bloc.dart';
 import '../../../configs/app_sizes.dart';
 import '../../../configs/colors.dart';
 import '../../../models/model.dart';
@@ -34,6 +36,8 @@ class MedicineTileState extends State<MedicineTile> {
     
     // Update hasTaken in the actual model
     widget.medicine.hasTaken = hasTaken.value;
+
+    context.read<MedicineBloc>().add(MarkAsTakenEvent(token: context.read<AuthBloc>().token??"", medicineId: widget.medicine.id??"", slotName: widget.shift == 0 ? "morning" : widget.shift == 1 ? "afternoon" : "evening", hasTaken: hasTaken.value));
 
     // Find and update next medicine
     WidgetsBinding.instance.addPostFrameCallback((_) {
