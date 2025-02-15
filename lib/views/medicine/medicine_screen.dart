@@ -81,10 +81,8 @@ class _MedicineScreenState extends State<MedicineScreen> {
             return Center(child: CircularProgressIndicator.adaptive(),);
           }else if(state is GetTodaysMedicineSuccessState){
             return TodaysMedicineList(todaysMedicineData: state.todaysMedicine,);
-
           }else if(state is GetTodaysMedicineFailedState){
             return AppNothingToDisplay(message: state.errorMessage,);
-
           }else {
             return AppNothingToDisplay();
           }

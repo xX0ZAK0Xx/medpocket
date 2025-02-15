@@ -85,9 +85,9 @@ class MedicineTileState extends State<MedicineTile> {
                       flex: 3,
                       child: Row(
                         children: [
-                          widget.medicine.type?.toLowerCase() == "tablet" 
+                          widget.medicine.type?.toLowerCase() == "injection" 
                           ? HugeIcon(
-                            icon: HugeIcons.strokeRoundedMedicineBottle02,
+                            icon: HugeIcons.strokeRoundedInjection,
                             color: isNextToTake ? AppColors.white : AppColors.primary,
                             size: 24.0.sp,
                           ) : widget.medicine.type?.toLowerCase() == "capsule"
@@ -95,8 +95,13 @@ class MedicineTileState extends State<MedicineTile> {
                             icon: HugeIcons.strokeRoundedMedicine02,
                             color: isNextToTake ? AppColors.white : AppColors.primary,
                             size: 24.0.sp,
+                          ) : widget.medicine.type?.toLowerCase() == "drop"
+                          ? HugeIcon(
+                            icon: HugeIcons.strokeRoundedDroplet,
+                            color: isNextToTake ? AppColors.white : AppColors.primary,
+                            size: 24.0.sp,
                           ) : HugeIcon(
-                            icon: HugeIcons.strokeRoundedInjection,
+                            icon: HugeIcons.strokeRoundedMedicineBottle02,
                             color: isNextToTake ? AppColors.white : AppColors.primary,
                             size: 24.0.sp,
                           ),

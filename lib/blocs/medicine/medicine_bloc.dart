@@ -126,7 +126,7 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
         "userId": userId,
         "medicineName": medicine.medicineName?.text,
         "type": medicine.type?.text,
-        "description": medicine.description?.text,
+        "description": "description",
         "dosage": {
             "morning": {
                 "take": medicine.dosage?.morning?.take?.value,
@@ -142,11 +142,13 @@ class MedicineBloc extends Bloc<MedicineEvent, MedicineState> {
             }
         },
         "duration": {
-            "start": medicine.duration?.start?.value?.toIso8601String(), // This will match today's start (midnight UTC)
-            "end": medicine.duration?.end?.value?.toIso8601String() // This is the end of today (midnight UTC next day)
+            "start": medicine.duration?.start?.value?.toUtc().toString(), // This will match today's start (midnight UTC)
+            "end": medicine.duration?.end?.value?.toUtc().toString() // This is the end of today (midnight UTC next day)
         }
       }).toList();
+      logger.i("payload: $payload");
       final res = await postResponse(url: AppUrls.createMedicine, token: event.token, payload: payload);
+      logger.f("res: $res");
       final ResponseModel responseModel = responseModelFromJson(res);
 
       if(responseModel.success == true) {
