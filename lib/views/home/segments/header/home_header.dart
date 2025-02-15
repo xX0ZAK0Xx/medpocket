@@ -6,7 +6,9 @@ import 'package:medpocket/blocs/bloc.dart';
 import 'package:medpocket/configs/app_sizes.dart';
 import 'package:medpocket/configs/colors.dart';
 
+import '../../../../configs/app_routes.dart';
 import '../../../../widgets/widgets.dart';
+import '../../../views.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});
@@ -100,23 +102,33 @@ class _HomeHeaderState extends State<HomeHeader> {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if(state is LogoutSuccessState){
+                AppRoutes.pushAndRemoveUntil(context, const SplashScreen());
+              }
             },
-            child: Container(
-              padding: EdgeInsets.all(AppSizes.bodyPadding),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(width: 0.5, color: AppColors.primary),
+            child: GestureDetector(
+              onTap: () {
+                appConfirmationDialog(context: context, title: "Log Out", description: "Do you really want to log out?\nWe will miss you.", onTapYes: (){
+                  context.read<AuthBloc>().add(LogoutEvent());
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(AppSizes.bodyPadding),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 0.5, color: AppColors.primary),
+                ),
+                child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedLogout02,
+                  color: AppColors.primary,
+                  size: 20.0.sp,
+                ),
               ),
-              child: HugeIcon(
-                icon: HugeIcons.strokeRoundedNotification03,
-                color: AppColors.primary,
-                size: 20.0.sp,
-              )
             ),
-          )
+          ),
+          SizedBox(width: AppSizes.bodyPadding,)
         ],
       )
     );

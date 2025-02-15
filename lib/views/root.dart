@@ -9,7 +9,6 @@ import 'package:medpocket/widgets/app_text_style.dart';
 import 'package:upgrader/upgrader.dart';
 
 import '../blocs/root/root_bloc.dart';
-import 'profile/profile_screen.dart';
 import 'reports/reports_screen.dart';
 import 'medicine/medicine_screen.dart';
 import 'home/home_screen.dart';
@@ -21,7 +20,7 @@ class RootScreen extends StatelessWidget{
     HomeScreen(),
     MedicineScreen(),
     ReportsScreen(),
-    ProfileScreen(),
+    // ProfileScreen(),
   ];
 
   @override
@@ -104,17 +103,17 @@ class RootScreen extends StatelessWidget{
                         },
                       ),
                     ),
-                    Expanded(
-                      child: buildNavItem(
-                        context,
-                        currentIndex == 3,
-                        icon: HugeIcons.strokeRoundedUser,
-                        label: "Profile",
-                        onTap: () {
-                          context.read<RootBloc>().add(NavigateToProfileEvent());
-                        },
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: buildNavItem(
+                    //     context,
+                    //     currentIndex == 3,
+                    //     icon: HugeIcons.strokeRoundedUser,
+                    //     label: "Profile",
+                    //     onTap: () {
+                    //       context.read<RootBloc>().add(NavigateToProfileEvent());
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
