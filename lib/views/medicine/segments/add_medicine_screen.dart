@@ -105,16 +105,102 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FloatingActionButton(
-                onPressed: _scanDocuments,
-                // backgroundColor: Colors.blue,
+                onPressed: () {
+                  appAlertDialog(
+                    barrierDismissible: false,
+                    actions: [
+                      // Cancel Button
+                      CupertinoDialogAction(
+                        onPressed: () {
+                          AppRoutes.pop(context);
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      // Proceed Button
+                      CupertinoDialogAction(
+                        onPressed: (){
+                          AppRoutes.pop(context);
+                          _scanDocuments();
+                        },
+                        child: Text(
+                          "Proceed",
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                    context,
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title with Icon
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: AppColors.primary,
+                              size: 24.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              "Hold on",
+                              style: myText(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                                fontSize: 18.sp,
+                              ).copyWith(fontFamily: "poppins"),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: AppSizes.bodyPadding * 2),
+                        // Description
+                        Text(
+                          "Please make sure the prescription is computer generated and medicines are written in this format:",
+                          style: myText(
+                            fontSize: 14.sp,
+                            color: AppColors.textColorb1,
+                          ).copyWith(fontFamily: "poppins"),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: AppSizes.bodyPadding),
+                        // Medicine Format Examples
+                        Container(
+                          padding: EdgeInsets.all(AppSizes.bodyPadding),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(AppSizes.borderRadiusBig),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildMedicineFormatRow("TAB", "Tablet Name", "1+0+0"),
+                              Divider(color: AppColors.grey.withOpacity(0.3)),
+                              _buildMedicineFormatRow("CAP", "Capsule Name", "1+0+1"),
+                              Divider(color: AppColors.grey.withOpacity(0.3)),
+                              _buildMedicineFormatRow("INJ", "Injection Name", "1+1+0"),
+                              Divider(color: AppColors.grey.withOpacity(0.3)),
+                              _buildMedicineFormatRow("DROP", "Drop Name", "0+1+1"),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: AppSizes.bodyPadding * 2),
+                      ],
+                    ),
+                  );
+                },
                 child: const Icon(Icons.camera_alt),
               ),
-              // SizedBox(height: 16), // Space between buttons
-              // FloatingActionButton(
-              //   onPressed: _addManualMedicine,
-              //   backgroundColor: Colors.green,
-              //   child: const Icon(Icons.add),
-              // ),
             ],
           ),
           appBar: AppBar(
@@ -183,6 +269,42 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             },
           ),
         ),
+    );
+  }
+  Widget _buildMedicineFormatRow(String type, String name, String dosage) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
+        children: [
+          Text(
+            type,
+            style: myText(
+              // fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: AppColors.primary,
+            ).copyWith(fontFamily: "poppins"),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Text(
+              name,
+              style: myText(
+                // fontSize: 14.sp,
+                color: AppColors.textColorb1,
+                // fontWeight: FontWeight.w500
+              ).copyWith(fontFamily: "poppins"),
+            ),
+          ),
+          Text(
+            dosage,
+            style: myText(
+              // fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: AppColors.primary,
+            ).copyWith(fontFamily: "poppins"),
+          ),
+        ],
+      ),
     );
   }
 
