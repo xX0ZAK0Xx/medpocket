@@ -25,7 +25,7 @@ class SplashScreenState extends State<SplashScreen> with TickerProviderStateMixi
         listener: (context, state) {
           if (state is UserAuthenticatedState) {
             // Navigate to home screen if user is already authenticated
-            AppRoutes.pushAndRemoveUntil(context, const HomeScreen());
+            AppRoutes.pushAndRemoveUntil(context, const RootScreen());
           } else if (state is FirebaseAuthSuccessState) {
             // Navigate to setup profile after successful sign up
             AppRoutes.pushAndRemoveUntil(context, const SetupProfile());
