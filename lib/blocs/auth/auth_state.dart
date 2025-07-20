@@ -2,6 +2,7 @@ part of 'auth_bloc.dart';
 
 sealed class AuthState {}
 
+final class AuthStateInitial extends AuthState {}
 final class AuthActionState extends AuthState {}
 //?Database Login
 final class PreviousLoginInitial extends AuthState {}
@@ -42,3 +43,27 @@ class PasswordResetErrorState extends AuthState {
 //? Log Out
 final class LogoutSuccessState extends AuthActionState {}
 final class LogoutFailedState extends AuthActionState {}
+
+
+// firebase states
+final class FirebaseAuthLoadingState extends AuthState {}
+
+final class FirebaseAuthSuccessState extends AuthState {
+  final User user;
+  
+  FirebaseAuthSuccessState({required this.user});
+}
+
+final class FirebaseAuthFailedState extends AuthState {
+  final String message;
+
+  FirebaseAuthFailedState({required this.message});
+}
+
+class UserAuthenticatedState extends AuthState {
+  final User user;
+  
+  UserAuthenticatedState({required this.user});
+}
+
+class UserNotAuthenticatedState extends AuthState {}

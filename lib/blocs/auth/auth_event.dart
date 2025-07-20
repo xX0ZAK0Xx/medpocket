@@ -1,6 +1,9 @@
 part of 'auth_bloc.dart';
 
 sealed class AuthEvent {}
+class FirebaseSignUpEvent extends AuthEvent{}
+class CheckAuthStatusEvent extends AuthEvent {}
+
 
 class InitialFetchLoginDataEvent extends AuthEvent{}
 
@@ -10,6 +13,7 @@ class LoginEvent extends AuthEvent{
 
   LoginEvent({required this.email, required this.password});
 }
+
 //!SignUp
 class SignUpEvent extends AuthEvent{
   final String email, password;

@@ -1,132 +1,73 @@
 import 'dart:async';
-import 'dart:isolate';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medpocket/repositories/post_response.dart';
-import '../../configs/app_constants.dart';
-import '../../configs/app_urls.dart';
-import '../../database/local_db.dart';
-import '../../models/model.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  String? email, password, token, name, phone;
-  AuthModel? authModel;
-  ResponseModel? responseModel;
+  String token = "";
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.standard(); // Updated constructor
 
-  AuthBloc() : super(PreviousLoginInitial()) {
-    on<InitialFetchLoginDataEvent>(initialFetchLoginDataEvent);
-    on<LoginEvent>(loginEvent);
-    on<SignUpEvent>(signUpEvent);
-    on<LogoutEvent>(logoutEvent);
-    on<PasswordResetEvent>(passwordResetEvent);
+  AuthBloc() : super(AuthStateInitial()) {
+    on<FirebaseSignUpEvent>(_firebaseSignUpEvent);
+    on<CheckAuthStatusEvent>(_checkAuthStatusEvent);
+    
+    // Check auth status when bloc is created
+    add(CheckAuthStatusEvent());
   }
 
-  FutureOr<void> initialFetchLoginDataEvent(
-      InitialFetchLoginDataEvent event, Emitter<AuthState> emit) async {
+  FutureOr<void> _firebaseSignUpEvent(
+    FirebaseSignUpEvent event, 
+    Emitter<AuthState> emit
+  ) async {
     try {
-      final myData = await LocalDB.getLoginInfo();
-      if (myData == null || myData[0].isEmpty || myData[1].isEmpty) {
-        emit(NoPreviousDataState());
+      emit(FirebaseAuthLoadingState());
+      
+      // Trigger the Google Sign In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return;
+      }
+      
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      
+      // Sign in to Firebase with the Google credential
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+      
+      if (user != null) {
+        emit(FirebaseAuthSuccessState(user: user));
       } else {
-        logger.f("message myData: ${myData.length}");
-        email = myData[0];
-        password = myData[1];
-        final payload = {
-        "email": email,
-        "password": password
-        };
-        final res = await postResponse(url: AppUrls.login, payload: payload);
-        final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
-        if(authModel.success == true) {
-          emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
-          LocalDB.setId(id: authModel.data?.id??"");
-          logger.d("Id from init: ${await LocalDB.getId()}");
-        }else{
-          emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
-        }
+        emit(FirebaseAuthFailedState(message: 'Sign in failed - no user returned'));
       }
+    } on FirebaseAuthException catch (e) {
+      emit(FirebaseAuthFailedState(message: e.message ?? 'Authentication failed'));
     } catch (e) {
-      logger.e("Error during fetch login data: $e");
-      emit(PreviousAuthErrorState(errorMessage: e.toString()));
+      emit(FirebaseAuthFailedState(message: e.toString()));
     }
   }
 
-  FutureOr<void> loginEvent(LoginEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState());
-    try {
-      final payload = {
-        "email": event.email,
-        "password": event.password
-      };
-      final res = await postResponse(url: AppUrls.login, payload: payload);
-      final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
-      if(authModel.success == true) {
-        emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
-        LocalDB.postLoginInfo(email: event.email, password: event.password);
-        LocalDB.setId(id: authModel.data?.id??"");
-      }else{
-        emit(AuthErrorState(errorMessage: authModel.message??""));
-      }
-    } catch (e) {
-      logger.e("Login error: $e");
-      logger.d("Id from login: ${await LocalDB.getId()}");
-      emit(AuthErrorState(errorMessage: "Login failed. Please try again."));
-    }
-  }
-
-  
-
-
-  Future<void> signUpEvent(SignUpEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState());
-    try {
-      final payload = {
-        "email": event.email,
-        "password": event.password,
-      };
-      final res = await postResponse(url: AppUrls.signup, payload: payload);
-      final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
-      if(authModel.success == true) {
-        emit(AuthSuccessState(allDone: false));
-        LocalDB.postLoginInfo(email: event.email, password: event.password);
-        LocalDB.setId(id: authModel.data?.id??"");
-        logger.d("Id from sign up: ${await LocalDB.getId()}");
-      }else{
-        emit(AuthErrorState(errorMessage: authModel.message??""));
-      }
-    } catch (e) {
-      logger.e(e);
-      emit(AuthErrorState(errorMessage: "An error occurred: $e"));
-    }
-  }
-
-  FutureOr<void> logoutEvent(LogoutEvent event, Emitter<AuthState> emit) {
-    try {
-      LocalDB.delLoginInfo();
-      emit(LogoutSuccessState());
-    } catch (e) {
-      emit(LogoutFailedState());
-    }
-  }
-  Future<void> passwordResetEvent(PasswordResetEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoadingState()); // Optional: Emit loading state if needed
-    try {
-    //   await FirebaseAuth.instance.sendPasswordResetEmail(email: event.email);
-    //   logger.i("Password reset email sent successfully");
-    //   emit(PasswordResetSuccessState());
-    // } on FirebaseAuthException catch (e) {
-    //   logger.e("Error sending password reset email: ${e.message}");
-    //   if (e.code == 'user-not-found') {
-    //     emit(PasswordResetErrorState(errorMessage: "No user found for that email."));
-    //   } else {
-    //     emit(PasswordResetErrorState(errorMessage: "Failed to send password reset email. Please try again."));
-    //   }
-    } catch (e) {
-      logger.e("Unknown error occurred: $e");
-      emit(PasswordResetErrorState(errorMessage: "An unknown error occurred. Please try again."));
+  FutureOr<void> _checkAuthStatusEvent(
+    CheckAuthStatusEvent event, 
+    Emitter<AuthState> emit
+  ) async {
+    await Future.delayed(const Duration(seconds: 1)); // Optional delay for splash screen
+    
+    final User? user = _auth.currentUser;
+    if (user != null) {
+      emit(UserAuthenticatedState(user: user));
+    } else {
+      emit(UserNotAuthenticatedState());
     }
   }
 }
