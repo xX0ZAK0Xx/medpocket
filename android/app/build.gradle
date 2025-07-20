@@ -27,35 +27,31 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.med.pocket"
+    namespace = "com.med.pocket" // <--- ADD THIS LINE (use your applicationId)
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-    // ndkVersion = "25.1.8937393"
+    // ndkVersion = "25.1.8937393" // Keep this commented unless you need a specific NDK
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        // Change to JavaVersion.VERSION_17 for newer AGP/Gradle.
+        sourceCompatibility = JavaVersion.VERSION_17 
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    kotlinOptions { // <--- ADD THIS BLOCK for Kotlin compatibility
+        jvmTarget = '17'
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.med.pocket"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        // minSdk = flutter.minSdkVersion
-        minSdk = 23
+        minSdk = 23 // You can keep this or update to flutter.minSdkVersion if you desire
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
-        ndk {
-            abiFilters "armeabi", "armeabi-v7a","arm64-v8a"
-        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
     }

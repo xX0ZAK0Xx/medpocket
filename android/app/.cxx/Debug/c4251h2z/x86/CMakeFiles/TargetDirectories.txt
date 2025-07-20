@@ -1,0 +1,2 @@
+E:/medpocket/medpocket/android/app/.cxx/Debug/c4251h2z/x86/CMakeFiles/edit_cache.dir
+E:/medpocket/medpocket/android/app/.cxx/Debug/c4251h2z/x86/CMakeFiles/rebuild_cache.dir
