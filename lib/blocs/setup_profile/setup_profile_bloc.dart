@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:isolate';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:medpocket/configs/app_urls.dart';
@@ -96,15 +97,30 @@ class SetupProfileBloc extends Bloc<SetupProfileEvent, SetupProfileState> {
       emit(GetProfileLoadingState());
     }
     try {
-      final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), from: 'Get Profile');
-      final ProfileModel responseModel = await Isolate.run(()=> profileModelFromJson(res));
-      if(responseModel.success == true){
-        name = responseModel.data?.name?? "";
-        photopath = responseModel.data?.imageUrl?? "";
-        emit(GetProfileSuccessState(data: responseModel.data??ProfileData()));
+      // check connectivity
+      final connectivityResult = await Connectivity().checkConnectivity();
+      final bool offline = connectivityResult.contains(ConnectivityResult.none);
+      if(offline){
+        final ProfileModel? localProfile = await LocalDB.getProfileData();
+        if(localProfile?.data?.name?.isNotEmpty ?? false){
+          name = localProfile?.data?.name ?? "";
+          photopath = localProfile?.data?.imageUrl ?? "";
+          emit(GetProfileSuccessState(data: localProfile?.data??ProfileData()));
+        }else{
+          emit(GetProfileFailedState(errorMessage: "Something went wrong"));
+        }
       }else{
-        logger.e(responseModel.message);
-        emit(GetProfileFailedState(errorMessage: responseModel.message??"Something went wrong"));
+        final res = await getResponse(url: AppUrls.profile(id: await LocalDB.getId()??""), from: 'Get Profile');
+        final ProfileModel responseModel = await Isolate.run(()=> profileModelFromJson(res));
+        if(responseModel.success == true){
+          name = responseModel.data?.name?? "";
+          photopath = responseModel.data?.imageUrl?? "";
+          emit(GetProfileSuccessState(data: responseModel.data??ProfileData()));
+          await LocalDB.setProfileData(responseModel);
+        }else{
+          logger.e(responseModel.message);
+          emit(GetProfileFailedState(errorMessage: responseModel.message??"Something went wrong"));
+        }
       }
     } catch (e) {
       logger.e(e.toString());

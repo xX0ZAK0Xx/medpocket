@@ -25,7 +25,7 @@ class _BmiGraphState extends State<BmiGraph> {
   @override
   void initState() {
     measurementsBloc = BlocProvider.of<MeasurementsBloc>(context);
-    measurementsBloc.add(GetMeasurementsEvent());
+    measurementsBloc.add(GetMeasurementsEvent(days: 7));
     super.initState();
   }
   @override
@@ -55,8 +55,7 @@ class _BmiGraphState extends State<BmiGraph> {
                       GestureDetector(
                         onTap: (){
                           if(measurementsBloc.days != 7){
-                            measurementsBloc.add(ChangDaysEvent(days: 7));
-                            measurementsBloc.add(GetMeasurementsEvent());
+                            measurementsBloc.add(GetMeasurementsEvent(days: 7));
                           }
                         },
                         child: Text("7D", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 7 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
@@ -65,8 +64,7 @@ class _BmiGraphState extends State<BmiGraph> {
                       GestureDetector(
                         onTap: (){
                           if(measurementsBloc.days != 15){
-                            measurementsBloc.add(ChangDaysEvent(days: 15));
-                            measurementsBloc.add(GetMeasurementsEvent());
+                            measurementsBloc.add(GetMeasurementsEvent(days: 15));
                           }
                         },
                         child: Text("15D", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 15 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),
@@ -75,8 +73,7 @@ class _BmiGraphState extends State<BmiGraph> {
                       GestureDetector(
                         onTap: (){
                           if(measurementsBloc.days != 30){
-                            measurementsBloc.add(ChangDaysEvent(days: 30));
-                            measurementsBloc.add(GetMeasurementsEvent());
+                            measurementsBloc.add(GetMeasurementsEvent(days: 30));
                           }
                         },
                         child: Text("1M", style: myText(fontWeight: FontWeight.bold, color: measurementsBloc.days == 30 ? AppColors.primary : AppColors.lightPink, fontSize: 14)),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/repositories/post_response.dart';
 import '../../configs/app_constants.dart';
@@ -23,7 +24,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutEvent>(logoutEvent);
     on<PasswordResetEvent>(passwordResetEvent);
   }
-
   FutureOr<void> initialFetchLoginDataEvent(
       InitialFetchLoginDataEvent event, Emitter<AuthState> emit) async {
     try {
@@ -31,21 +31,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (myData == null || myData[0].isEmpty || myData[1].isEmpty) {
         emit(NoPreviousDataState());
       } else {
-        logger.f("message myData: ${myData.length}");
-        email = myData[0];
-        password = myData[1];
-        final payload = {
-        "email": email,
-        "password": password
-        };
-        final res = await postResponse(url: AppUrls.login, payload: payload);
-        final AuthModel authModel = await Isolate.run(() =>  authModelFromJson(res));
-        if(authModel.success == true) {
-          emit(AuthSuccessState(allDone: authModel.data?.allSetup??false));
-          LocalDB.setId(id: authModel.data?.id??"");
-          logger.d("Id from init: ${await LocalDB.getId()}");
-        }else{
-          emit(PreviousAuthErrorState(errorMessage: authModel.message??""));
+        // check connectivity
+        final connectivityResult = await Connectivity().checkConnectivity();
+        final bool offline = connectivityResult.contains(ConnectivityResult.none);
+        if (offline) {
+          logger.f("offline");
+          // if offline, then show previous data
+          final ProfileModel? localProfile = await LocalDB.getProfileData();
+          if (localProfile?.data?.name?.isNotEmpty ?? false) {
+            name = localProfile?.data?.name ?? "";
+            phone = localProfile?.data?.phoneNumber ?? "";
+            emit(AuthSuccessState(allDone: true));
+          } else {
+            emit(PreviousAuthErrorState(errorMessage: "Something went wrong"));
+          }
+        } else {
+          logger.f("online");
+          // else login again
+          logger.f("message myData: ${myData.length}");
+          email = myData[0];
+          password = myData[1];
+          final payload = {
+            "email": email,
+            "password": password,
+          };
+          final res = await postResponse(url: AppUrls.login, payload: payload);
+          final AuthModel authModel =
+              await Isolate.run(() => authModelFromJson(res));
+          if (authModel.success == true) {
+            emit(AuthSuccessState(allDone: authModel.data?.allSetup ?? false));
+            LocalDB.setId(id: authModel.data?.id ?? "");
+            logger.d("Id from init: ${await LocalDB.getId()}");
+          } else {
+            emit(PreviousAuthErrorState(
+                errorMessage: authModel.message ?? ""));
+          }
         }
       }
     } catch (e) {

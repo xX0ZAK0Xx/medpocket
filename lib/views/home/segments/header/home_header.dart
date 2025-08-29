@@ -50,10 +50,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: 
-                                state.data.imageUrl != null && state.data.imageUrl != '' ?
-                                 NetworkImage('${state.data.imageUrl}') :
-                                const AssetImage('assets/images/avatar.png') as ImageProvider,
+                            image: state.data.imageUrl != null && state.data.imageUrl != '' ? NetworkImage('${state.data.imageUrl}') :const AssetImage('assets/images/avatar.png') as ImageProvider,
                             fit: BoxFit.cover,
                             onError: (error, stackTrace) {
                               const AssetImage('assets/images/avatar.png');

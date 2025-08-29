@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medpocket/configs/app_constants.dart';
 import 'package:medpocket/configs/app_urls.dart';
@@ -26,56 +27,109 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   FutureOr<void> getDashboardEvent(GetDashboardEvent event, Emitter<DashboardState> emit) async {
-    emit(GetDashboardLoadingState(dashboardData: DashboardData(
-      glucose: DashboardGlucose(
-        date: DateTime.now(),
-        glucose: glucose,
-      ),
-      measurements: DashboardMeasurements(
-        bmi: 0,
-        height: feetInchesToCm(foot: feet, inch: inch),
-        weight: weight,
-        date: DateTime.now()
-      ),
-      pressure: DashboardPressure(
-        data: DateTime.now(),
-        highPressure: highPressure,
-        lowPressure: lowPressure,
-      )
-    )));
-    try {
-      final res = await getResponse(url: AppUrls.dashboard(id: await LocalDB.getId()??""), from: "Get Dashboard Data");
-      final DashboardModel dashboardModel = dashboardModelFromJson(res);
-      if(dashboardModel.success == true) {
-        feet = cmToFeetInches(dashboardModel.data?.measurements?.height??0).foot;
-        inch = cmToFeetInches(dashboardModel.data?.measurements?.height??0).inch;
-        weight = dashboardModel.data?.measurements?.weight??0;
-        highPressure = dashboardModel.data?.pressure?.highPressure??0;
-        lowPressure = dashboardModel.data?.pressure?.lowPressure??0;
-        glucose = dashboardModel.data?.glucose?.glucose??0;
+    // check connectivity
+    final connectivityResult = await Connectivity().checkConnectivity();
+    final bool offline = connectivityResult.contains(ConnectivityResult.none);
+    if (offline) {
+      final DashboardModel? localDashboard = await LocalDB.getDashboardData();
+      if (localDashboard?.data != null) {
+        logger.e("----------------glucose: ${localDashboard?.data?.glucose?.toJson()}");
+        logger.e("----------------measurements: ${localDashboard?.data?.measurements?.toJson()}");
+        logger.e("----------------pressure: ${localDashboard?.data?.pressure?.toJson()}");
         emit(GetDashboardSuccessState(dashboardData: DashboardData(
           glucose: DashboardGlucose(
-            glucose: glucose, date: dashboardModel.data?.glucose?.date?? DateTime.now(),
-            todayGlucose: dashboardModel.data?.glucose?.todayGlucose,
+            date: DateTime.now(),
+            glucose: localDashboard?.data?.glucose?.glucose??0.0,
+            todayGlucose: localDashboard?.data?.glucose?.todayGlucose??[],
           ),
           measurements: DashboardMeasurements(
-            height: feetInchesToCm(foot: feet, inch: inch),
-            weight: weight,
-            bmi: dashboardModel.data?.measurements?.bmi??0,
-            date: dashboardModel.data?.measurements?.date?? DateTime.now(),
+            bmi: localDashboard?.data?.measurements?.bmi??0,
+            height: localDashboard?.data?.measurements?.height??0,
+            weight: localDashboard?.data?.measurements?.weight??0,
+            date: DateTime.now(),
           ),
           pressure: DashboardPressure(
-            todayPressure: dashboardModel.data?.pressure?.todayPressure,
-            highPressure: highPressure, lowPressure: lowPressure, data: dashboardModel.data?.pressure?.data?? DateTime.now()
+            data: DateTime.now(),
+            highPressure: localDashboard?.data?.pressure?.highPressure??0,
+            lowPressure: localDashboard?.data?.pressure?.lowPressure??0,
+            todayPressure: localDashboard?.data?.pressure?.todayPressure??[],
           ),
+          averageBmi: localDashboard?.data?.averageBmi??0,
+          maxBmi: localDashboard?.data?.maxBmi??0,
+          minBmi: localDashboard?.data?.minBmi??0
         )));
       }else{
-        emit(GetDashboardFailedState(errorMessage: dashboardModel.message??"Failed to get dashboard data"));
-        logger.e(dashboardModel.message??"Failed to get dashboard data");
+        emit(GetDashboardLoadingState(dashboardData: DashboardData(
+          glucose: DashboardGlucose(
+            date: DateTime.now(),
+            glucose: glucose,
+          ),
+          measurements: DashboardMeasurements(
+            bmi: 0,
+            height: feetInchesToCm(foot: feet, inch: inch),
+            weight: weight,
+            date: DateTime.now()
+          ),
+          pressure: DashboardPressure(
+            data: DateTime.now(),
+            highPressure: highPressure,
+            lowPressure: lowPressure,
+          ),
+        )));
       }
-    } catch (e) {
-        logger.e(e.toString());
-        emit(GetDashboardFailedState(errorMessage: e.toString()));
+    }else{
+      emit(GetDashboardLoadingState(dashboardData: DashboardData(
+        glucose: DashboardGlucose(
+          date: DateTime.now(),
+          glucose: glucose,
+        ),
+        measurements: DashboardMeasurements(
+          bmi: 0,
+          height: feetInchesToCm(foot: feet, inch: inch),
+          weight: weight,
+          date: DateTime.now()
+        ),
+        pressure: DashboardPressure(
+          data: DateTime.now(),
+          highPressure: highPressure,
+          lowPressure: lowPressure,
+        )
+      )));
+      try {
+        final res = await getResponse(url: AppUrls.dashboard(id: await LocalDB.getId()??""), from: "Get Dashboard Data");
+        final DashboardModel dashboardModel = dashboardModelFromJson(res);
+        if(dashboardModel.success == true) {
+          feet = cmToFeetInches(dashboardModel.data?.measurements?.height??0).foot;
+          inch = cmToFeetInches(dashboardModel.data?.measurements?.height??0).inch;
+          weight = dashboardModel.data?.measurements?.weight??0;
+          highPressure = dashboardModel.data?.pressure?.highPressure??0;
+          lowPressure = dashboardModel.data?.pressure?.lowPressure??0;
+          glucose = dashboardModel.data?.glucose?.glucose??0;
+          emit(GetDashboardSuccessState(dashboardData: DashboardData(
+            glucose: DashboardGlucose(
+              glucose: glucose, date: dashboardModel.data?.glucose?.date?? DateTime.now(),
+              todayGlucose: dashboardModel.data?.glucose?.todayGlucose,
+            ),
+            measurements: DashboardMeasurements(
+              height: feetInchesToCm(foot: feet, inch: inch),
+              weight: weight,
+              bmi: dashboardModel.data?.measurements?.bmi??0,
+              date: dashboardModel.data?.measurements?.date?? DateTime.now(),
+            ),
+            pressure: DashboardPressure(
+              todayPressure: dashboardModel.data?.pressure?.todayPressure,
+              highPressure: highPressure, lowPressure: lowPressure, data: dashboardModel.data?.pressure?.data?? DateTime.now()
+            ),
+          )));
+          await LocalDB.setDashboardData(dashboardModel);
+        }else{
+          emit(GetDashboardFailedState(errorMessage: dashboardModel.message??"Failed to get dashboard data"));
+          logger.e(dashboardModel.message??"Failed to get dashboard data");
+        }
+      } catch (e) {
+          logger.e(e.toString());
+          emit(GetDashboardFailedState(errorMessage: e.toString()));
+      }
     }
   }
 

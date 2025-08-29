@@ -48,7 +48,7 @@ class _YourHealthState extends State<YourHealth> {
           } else if (state is UpdateHeightWeightSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.successSnackbar(title: "Congrats", message: "Height and weight updated successfully!"));
             context.read<DashboardBloc>().add(GetDashboardEvent());
-            context.read<MeasurementsBloc>().add(GetMeasurementsEvent());
+            context.read<MeasurementsBloc>().add(GetMeasurementsEvent(days: 7));
           } else if (state is UpdateBloodPressureFailedState) {
             ScaffoldMessenger.of(context).showSnackBar(AppSnackbar.failedSnackbar(title: "Sorry", message: "${state.errorMessage}. Please try again later."));
           } else if (state is UpdateBloodPressureSuccessState) {
